@@ -1,5 +1,17 @@
 import Image from "next/image";
+import { Suspense } from "react";
 import GameMap from "@/components/map/GameMap";
+import { getMapAdminClient, readHiddenPointIds } from "@/lib/supabase/map-server";
+
+async function MapContent() {
+  const [hiddenPointIds, admin] = await Promise.all([readHiddenPointIds(), getMapAdminClient()]);
+
+  if (!hiddenPointIds) {
+    return <div className="map-loading" role="alert">Mapu se nepodařilo načíst. Zkus obnovit stránku.</div>;
+  }
+
+  return <GameMap hiddenPointIds={hiddenPointIds} canManagePoints={Boolean(admin)} />;
+}
 
 export default function Home() {
   return (
@@ -14,7 +26,9 @@ export default function Home() {
           unoptimized
         />
       </h1>
-      <GameMap />
+      <Suspense fallback={<div className="map-loading" role="status">Načítám mapu…</div>}>
+        <MapContent />
+      </Suspense>
     </main>
   );
 }

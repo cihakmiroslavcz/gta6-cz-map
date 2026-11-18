@@ -19,6 +19,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MapContainer, Marker, Popup, Rectangle, useMap } from "react-leaflet";
 import ClusterGroup from "react-leaflet-cluster";
+import type { GameMapProps } from "./GameMap";
 import MapTools from "./MapTools";
 import PointCard from "./PointCard";
 import { allPointCategories, mapPoints, pointLinkParam, pointTypes, type MapPoint, type PointCategory } from "./map-points";
@@ -223,12 +224,14 @@ function MapLayers() {
 }
 
 type PointMarkersProps = {
+  points: MapPoint[];
+  canManagePoints: boolean;
   selectedCategories: Record<PointCategory, boolean>;
   selection: { point: MapPoint } | null;
   clustering: boolean;
 };
 
-function PointMarkers({ selectedCategories, selection, clustering }: PointMarkersProps) {
+function PointMarkers({ points, canManagePoints, selectedCategories, selection, clustering }: PointMarkersProps) {
   const map = useMap();
   const markers = useRef(new Map<string, LeafletMarker>());
   const group = useRef<MarkerClusterGroup>(null);
@@ -257,7 +260,7 @@ function PointMarkers({ selectedCategories, selection, clustering }: PointMarker
     };
   }, [map, selection]);
 
-  const visibleMarkers = useMemo(() => mapPoints.filter(({ category }) => selectedCategories[category]).map((point) => (
+  const visibleMarkers = useMemo(() => points.filter(({ category }) => selectedCategories[category]).map((point) => (
     <Marker
       key={point.id}
       ref={(marker) => {
@@ -269,10 +272,10 @@ function PointMarkers({ selectedCategories, selection, clustering }: PointMarker
       title={point.name}
     >
       <Popup maxWidth={320} autoPanPaddingTopLeft={[16, 152]} autoPanPaddingBottomRight={[16, 136]}>
-        <PointCard point={point} />
+        <PointCard point={point} canManagePoint={canManagePoints} />
       </Popup>
     </Marker>
-  )), [selectedCategories]);
+  )), [points, canManagePoints, selectedCategories]);
 
   return clustering ? (
     <ClusterGroup
@@ -287,11 +290,15 @@ function PointMarkers({ selectedCategories, selection, clustering }: PointMarker
   ) : visibleMarkers;
 }
 
-export default function LeafletGameMap() {
+export default function LeafletGameMap({ hiddenPointIds, canManagePoints }: GameMapProps) {
+  const points = useMemo(() => {
+    const hidden = new Set(hiddenPointIds);
+    return mapPoints.filter(({ id }) => !hidden.has(id));
+  }, [hiddenPointIds]);
   const [selectedCategories, setSelectedCategories] = useState(allPointCategories);
   const [selection, setSelection] = useState<PointMarkersProps["selection"]>(() => {
     const pointId = new URLSearchParams(window.location.search).get(pointLinkParam);
-    const point = mapPoints.find(({ id }) => id === pointId);
+    const point = points.find(({ id }) => id === pointId);
     return point ? { point } : null;
   });
   const [initialView] = useState<MapView>(() =>
@@ -322,6 +329,8 @@ export default function LeafletGameMap() {
   return (
     <>
       <MapTools
+        points={points}
+        canManagePoints={canManagePoints}
         selectedCategories={selectedCategories}
         onCategoryChange={(category, checked) =>
           setSelectedCategories((previous) => ({ ...previous, [category]: checked }))
@@ -352,7 +361,13 @@ export default function LeafletGameMap() {
           stroke={false}
           fillOpacity={1}
         />
-        <PointMarkers selectedCategories={selectedCategories} selection={selection} clustering={clustering} />
+        <PointMarkers
+          points={points}
+          canManagePoints={canManagePoints}
+          selectedCategories={selectedCategories}
+          selection={selection}
+          clustering={clustering}
+        />
       </MapContainer>
     </>
   );

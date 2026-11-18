@@ -1,12 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
+import { hidePoint } from "@/app/admin/actions";
 import MaterialIcon from "@/components/MaterialIcon";
 import { pointCategories, pointLinkParam, pointTypes, type MapPoint } from "./map-points";
 
 const reportEmail = process.env.NEXT_PUBLIC_MAP_REPORT_EMAIL?.trim();
 
-export default function PointCard({ point }: { point: MapPoint }) {
+function HidePointForm({ pointId }: { pointId: string }) {
+  const [error, action, pending] = useActionState(hidePoint, null);
+
+  return (
+    <form action={action} className="point-hide">
+      <input type="hidden" name={pointLinkParam} value={pointId} />
+      <button type="submit" disabled={pending}>{pending ? "Skrývá se…" : "Skrýt bod"}</button>
+      {error && <p role="alert">{error}</p>}
+    </form>
+  );
+}
+
+export default function PointCard({ point, canManagePoint = false }: { point: MapPoint; canManagePoint?: boolean }) {
   const [shareStatus, setShareStatus] = useState<
     { copied: true } | { copied: false; link: string } | null
   >(null);
@@ -68,6 +81,7 @@ export default function PointCard({ point }: { point: MapPoint }) {
           </label>
         )}
       </footer>
+      {canManagePoint && <HidePointForm pointId={point.id} />}
     </article>
   );
 }

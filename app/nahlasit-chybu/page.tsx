@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Suspense } from "react";
 import MaterialIcon from "@/components/MaterialIcon";
 import { mapPoints, pointLinkParam, type MapPoint } from "@/components/map/map-points";
+import { readHiddenPointIds } from "@/lib/supabase/map-server";
 import styles from "./report.module.css";
 
 export const metadata: Metadata = {
@@ -71,9 +72,10 @@ function ReportForm({ point, email, mapHref }: { point: MapPoint; email: string;
 }
 
 async function ReportContent({ searchParams }: Pick<ReportPageProps, "searchParams">) {
-  const params = await searchParams;
+  const [params, hiddenPointIds] = await Promise.all([searchParams, readHiddenPointIds()]);
+  if (!hiddenPointIds) return <p>Údaje o bodu se nepodařilo načíst. Zkus obnovit stránku.</p>;
   const pointId = params[pointLinkParam];
-  const point = mapPoints.find(({ id }) => id === pointId);
+  const point = mapPoints.find(({ id }) => id === pointId && !hiddenPointIds.includes(id));
   const mapHref = point ? `/?${new URLSearchParams({ [pointLinkParam]: point.id })}` : "/";
 
   return (

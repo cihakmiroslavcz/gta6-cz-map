@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import MaterialIcon from "@/components/MaterialIcon";
 import MapFilters, { type MapFiltersProps } from "./MapFilters";
-import { mapPoints, pointCategories, pointCategoryCounts, pointTypes, type MapPoint } from "./map-points";
+import { countPointCategories, pointCategories, pointTypes, type MapPoint } from "./map-points";
 
 const legendSections = [
   {
@@ -33,6 +33,8 @@ const legendSections = [
 ];
 
 type MapToolsProps = MapFiltersProps & {
+  points: MapPoint[];
+  canManagePoints: boolean;
   onPointSelect: (point: MapPoint) => void;
   clustering: boolean;
   onClusteringChange: (enabled: boolean) => void;
@@ -47,7 +49,7 @@ function normalizeSearch(text: string) {
     .replace(/\s+/g, " ");
 }
 
-const searchablePoints = mapPoints.map((point) => {
+function indexPoint(point: MapPoint) {
   const { label, aliases } = pointTypes[point.type];
   return {
     point,
@@ -55,12 +57,14 @@ const searchablePoints = mapPoints.map((point) => {
       point.id, point.name, point.sourceName, point.location, label, pointCategories[point.category], ...aliases,
     ].join(" ")),
   };
-});
+}
 
 const searchLimit = 40;
 const contactEmail = process.env.NEXT_PUBLIC_MAP_REPORT_EMAIL?.trim();
 
 export default function MapTools({
+  points,
+  canManagePoints,
   selectedCategories,
   onCategoryChange,
   onPointSelect,
@@ -71,10 +75,12 @@ export default function MapTools({
   const [query, setQuery] = useState("");
   const searchPanel = useRef<HTMLDivElement>(null);
   const searchInput = useRef<HTMLInputElement>(null);
+  const searchablePoints = useMemo(() => points.map(indexPoint), [points]);
+  const categoryCounts = useMemo(() => countPointCategories(points), [points]);
   const searchTerm = normalizeSearch(query);
   const searchWords = searchTerm.split(" ");
   const exactPoint = /^l\d+$/.test(searchTerm)
-    ? mapPoints.find(({ id }) => id.toLowerCase() === searchTerm)
+    ? points.find(({ id }) => id.toLowerCase() === searchTerm)
     : undefined;
   const results = exactPoint ? [exactPoint] : searchTerm
     ? searchablePoints
@@ -198,7 +204,7 @@ export default function MapTools({
           <MapFilters
             selectedCategories={selectedCategories}
             onCategoryChange={onCategoryChange}
-            categoryCounts={pointCategoryCounts}
+            categoryCounts={categoryCounts}
           />
         </div>
         <div id="map-legend-panel" className="map-tools-panel map-glass" hidden={openPanel !== "legend"}>
@@ -237,6 +243,12 @@ export default function MapTools({
               onChange={(event) => onClusteringChange(event.target.checked)}
             />
           </label>
+          {canManagePoints && (
+            <div className="map-settings-section">
+              <h3>Administrace</h3>
+              <p><a href="/admin">Správa skrytých bodů</a></p>
+            </div>
+          )}
           <div className="map-settings-section">
             <h3>O projektu</h3>
             <p>

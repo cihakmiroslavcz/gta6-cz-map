@@ -33,6 +33,22 @@ Pro zobrazení tlačítka **Nahlásit chybu** v detailu bodu nastav veřejnou e-
 
 Formulář doručuje zprávy přes [FormSubmit](https://formsubmit.co/). Po prvním odeslání z produkční mapy potvrď aktivaci od FormSubmit v projektové schránce, aby služba začala zprávy doručovat.
 
+## Správa bodů v Supabase
+
+1. V SQL Editoru spusť migraci [map_moderation.sql](supabase/migrations/20261118000000_map_moderation.sql).
+2. V **Authentication → Users** založ účet správce s e-mailem a heslem. Zkopíruj jeho UUID a v SQL Editoru ho přidej mezi správce.
+
+   ```sql
+   insert into public.map_admins (user_id)
+   values ('UUID_SPRAVCE'::uuid)
+   on conflict do nothing;
+   ```
+
+3. Nastav `NEXT_PUBLIC_SUPABASE_URL` a `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` v `.env.local`. Pro produkci nastav stejné proměnné na Vercelu před buildem.
+4. Přihlas se na `/admin`, otevři mapu a v detailu pinu zvol **Skrýt bod**. Na `/admin` můžeš skrytý bod obnovit.
+
+Tabulka skrytých bodů ukládá jen jejich ID. Databázové zásady umožňují veřejné čtení ID a upravovat tabulku mohou pouze přihlášení správci.
+
 ## Písmo a ikony
 
 [Onest](https://github.com/google/fonts/tree/main/ofl/onest) je pod licencí SIL Open Font License 1.1. [Google Material Symbols Rounded](https://developers.google.com/fonts/docs/material_symbols) jsou pod licencí Apache 2.0. Projekt používá místní výběr ikon. Texty licencí jsou ve složce `app/fonts/`.

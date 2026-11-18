@@ -454,10 +454,14 @@ export const mapPoints = [
   ...gtadbPoints.filter(({ id }) => !curatedIds.has(id)).map(importPoint),
 ].filter(({ category }) => category !== "uncategorized");
 
-export const pointCategoryCounts = mapPoints.reduce((counts, { category }) => {
-  counts[category] += 1;
-  return counts;
-}, { city: 0, nature: 0, landmark: 0, uncategorized: 0 });
+export function countPointCategories(points: MapPoint[]) {
+  return points.reduce((counts, { category }) => {
+    counts[category] += 1;
+    return counts;
+  }, { city: 0, nature: 0, landmark: 0, uncategorized: 0 });
+}
+
+export const pointCategoryCounts = countPointCategories(mapPoints);
 
 export const visiblePointCategories = (Object.keys(pointCategories) as PointCategory[])
   .filter((category) => pointCategoryCounts[category] > 0);

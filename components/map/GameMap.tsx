@@ -2,6 +2,11 @@
 
 import dynamic from "next/dynamic";
 
+export type GameMapProps = {
+  hiddenPointIds: string[];
+  canManagePoints: boolean;
+};
+
 const LeafletGameMap = dynamic(() => import("./LeafletGameMap"), {
   ssr: false,
   loading: () => (
@@ -11,6 +16,6 @@ const LeafletGameMap = dynamic(() => import("./LeafletGameMap"), {
   ),
 });
 
-export default function GameMap() {
-  return <LeafletGameMap />;
+export default function GameMap(props: GameMapProps) {
+  return <LeafletGameMap {...props} />;
 }

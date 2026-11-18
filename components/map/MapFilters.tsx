@@ -9,11 +9,15 @@ export type MapFiltersProps = {
 const countFormat = new Intl.NumberFormat("cs-CZ");
 
 export default function MapFilters({ selectedCategories, onCategoryChange, categoryCounts }: MapFiltersProps) {
+  const categories = categoryCounts
+    ? visiblePointCategories.filter((category) => categoryCounts[category] > 0)
+    : visiblePointCategories;
+
   return (
     <fieldset className="map-filters">
       <legend>Kategorie bodů</legend>
       <div className="map-filter-options">
-        {visiblePointCategories.map((category) => (
+        {categories.map((category) => (
           <label className="map-filter-option" key={category}>
             <span className={`point-symbol point-${category}`} aria-hidden="true" />
             <span>{pointCategories[category]}</span>
