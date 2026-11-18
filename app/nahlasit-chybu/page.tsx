@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Suspense } from "react";
 import MaterialIcon from "@/components/MaterialIcon";
 import { mapPoints, pointLinkParam, type MapPoint } from "@/components/map/map-points";
+import { mapContactEmail } from "@/lib/map-contact";
 import { readHiddenPointIds } from "@/lib/supabase/map-server";
 import styles from "./report.module.css";
 
@@ -11,17 +12,16 @@ export const metadata: Metadata = {
 };
 
 const publicMapOrigin = "https://gta6-cz-map.vercel.app";
-const reportEmail = process.env.NEXT_PUBLIC_MAP_REPORT_EMAIL?.trim();
 
 type ReportPageProps = PageProps<"/nahlasit-chybu">;
 
-function ReportForm({ point, email, mapHref }: { point: MapPoint; email: string; mapHref: string }) {
+function ReportForm({ point, mapHref }: { point: MapPoint; mapHref: string }) {
   const coordinates = `X ${point.x}, Y ${point.y}`;
   const mapUrl = new URL(mapHref, publicMapOrigin);
   const returnUrl = new URL("/nahlasit-chybu", publicMapOrigin);
   returnUrl.searchParams.set(pointLinkParam, point.id);
   returnUrl.searchParams.set("odeslano", "1");
-  const recipient = encodeURIComponent(email).replace("%40", "@");
+  const recipient = encodeURIComponent(mapContactEmail).replace("%40", "@");
 
   return (
     <form className={styles.form} action={`https://formsubmit.co/${recipient}`} method="post" aria-label="Hlášení chyby">
@@ -89,10 +89,8 @@ async function ReportContent({ searchParams }: Pick<ReportPageProps, "searchPara
         <p role="status">Díky za hlášení chyby u bodu {point.name}.</p>
       ) : !point ? (
         <p>Bod se nepodařilo najít. Otevři jeho detail na mapě a zvol „Nahlásit chybu“.</p>
-      ) : !reportEmail ? (
-        <p>Formulář pro hlášení chyb momentálně není dostupný.</p>
       ) : (
-        <ReportForm point={point} email={reportEmail} mapHref={mapHref} />
+        <ReportForm point={point} mapHref={mapHref} />
       )}
     </>
   );

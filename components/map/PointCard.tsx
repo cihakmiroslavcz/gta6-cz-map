@@ -5,8 +5,6 @@ import { hidePoint } from "@/app/admin/actions";
 import MaterialIcon from "@/components/MaterialIcon";
 import { pointCategories, pointLinkParam, pointTypes, type MapPoint } from "./map-points";
 
-const reportEmail = process.env.NEXT_PUBLIC_MAP_REPORT_EMAIL?.trim();
-
 function HidePointForm({ pointId }: { pointId: string }) {
   const [error, action, pending] = useActionState(hidePoint, null);
 
@@ -60,14 +58,12 @@ export default function PointCard({ point, canManagePoint = false }: { point: Ma
             <MaterialIcon name="content_copy" />
             Zkopírovat odkaz
           </button>
-          {reportEmail && (
-            <a
-              className="point-report"
-              href={`/nahlasit-chybu?${new URLSearchParams({ [pointLinkParam]: point.id })}`}
-            >
-              Nahlásit chybu
-            </a>
-          )}
+          <a
+            className="point-report"
+            href={`/nahlasit-chybu?${new URLSearchParams({ [pointLinkParam]: point.id })}`}
+          >
+            Nahlásit chybu
+          </a>
         </div>
         {shareStatus?.copied && <span role="status">Odkaz zkopírován.</span>}
         {shareStatus && !shareStatus.copied && (

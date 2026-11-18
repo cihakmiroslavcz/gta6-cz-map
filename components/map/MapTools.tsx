@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import MaterialIcon from "@/components/MaterialIcon";
+import { mapContactEmail } from "@/lib/map-contact";
 import MapFilters, { type MapFiltersProps } from "./MapFilters";
 import { countPointCategories, pointCategories, pointTypes, type MapPoint } from "./map-points";
 
@@ -60,7 +61,6 @@ function indexPoint(point: MapPoint) {
 }
 
 const searchLimit = 40;
-const contactEmail = process.env.NEXT_PUBLIC_MAP_REPORT_EMAIL?.trim();
 
 export default function MapTools({
   points,
@@ -261,15 +261,13 @@ export default function MapTools({
               známky společnosti <a href="https://www.take2games.com/">Take-Two Interactive Software, Inc.</a>
             </p>
           </div>
-          {contactEmail && (
-            <div className="map-settings-section">
-              <h3>Kontakt</h3>
-              <p>
-                Dotazy, připomínky a návrhy na doplnění mapy nám můžeš poslat na{" "}
-                <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
-              </p>
-            </div>
-          )}
+          <div className="map-settings-section">
+            <h3>Kontakt</h3>
+            <p>
+              Dotazy, připomínky a návrhy na doplnění mapy nám můžeš poslat na{" "}
+              <a href={`mailto:${mapContactEmail}`}>{mapContactEmail}</a>.
+            </p>
+          </div>
           <div className="map-settings-section">
             <h3>Kredity</h3>
             <p>

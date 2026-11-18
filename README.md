@@ -29,7 +29,7 @@ Body bez zařazení jsou dočasně vyřazené z mapy, vyhledávání i přehledu
 
 ## Hlášení chyb
 
-Pro zobrazení tlačítka **Nahlásit chybu** v detailu bodu nastav veřejnou e-mailovou adresu projektu v proměnné `NEXT_PUBLIC_MAP_REPORT_EMAIL`. Pro místní vývoj ji přidej do `.env.local` a restartuj vývojový server. Na Vercelu ji nastav pro příslušné prostředí před buildem. Tlačítko otevře formulář na `/nahlasit-chybu` s názvem a ID bodu, odkazem na produkční mapu a herními souřadnicemi.
+Tlačítko **Nahlásit chybu** v detailu bodu otevře formulář na `/nahlasit-chybu` s názvem a ID bodu, odkazem na produkční mapu a herními souřadnicemi. Výchozí adresa pro hlášení a kontakt je `gta6czmap@gmail.com`. Pro jiné prostředí ji lze před buildem změnit proměnnou `NEXT_PUBLIC_MAP_REPORT_EMAIL`.
 
 Formulář doručuje zprávy přes [FormSubmit](https://formsubmit.co/). Po prvním odeslání z produkční mapy potvrď aktivaci od FormSubmit v projektové schránce, aby služba začala zprávy doručovat.
 
