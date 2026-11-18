@@ -106,6 +106,49 @@
   color: var(--glass-muted);
 }
 
+.suggestions,
+.suggestionList,
+.suggestionList li {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.suggestions {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--glass-edge);
+}
+
+.suggestionList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.suggestionList li {
+  padding-block: var(--space-3);
+  border-bottom: 1px solid var(--glass-edge);
+  overflow-wrap: anywhere;
+}
+
+.suggestionList h3 {
+  margin: 0;
+  font-size: var(--map-control-size);
+}
+
+.suggestionList small {
+  color: var(--glass-muted);
+}
+
+.suggestionList p {
+  white-space: pre-wrap;
+}
+
+.suggestionList a {
+  justify-self: start;
+  color: var(--glass-ink);
+  text-underline-offset: 2px;
+}
+
 .panel :is(input, button, a):focus-visible {
   outline: 2px solid #b9ebff;
   outline-offset: var(--space-1);

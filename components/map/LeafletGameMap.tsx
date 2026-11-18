@@ -19,7 +19,9 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MapContainer, Marker, Popup, Rectangle, useMap } from "react-leaflet";
 import ClusterGroup from "react-leaflet-cluster";
+import { mapViewOnlyParam, maxZoom, readMapLocation, worldHalfSize } from "@/lib/map-location";
 import type { GameMapProps } from "./GameMap";
+import MapLocationMenu from "./MapLocationMenu";
 import MapTools from "./MapTools";
 import PointCard from "./PointCard";
 import { allPointCategories, mapPoints, pointLinkParam, pointTypes, type MapPoint, type PointCategory } from "./map-points";
@@ -27,7 +29,6 @@ import { allPointCategories, mapPoints, pointLinkParam, pointTypes, type MapPoin
 const tileRoot = "/maps/tiles/6/yanis,18";
 const tileSize = 256;
 const emptyTile = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E";
-const worldHalfSize = 16384;
 const metersPerPixelAtZoomZero = 32;
 const pixelOrigin = worldHalfSize / metersPerPixelAtZoomZero;
 
@@ -58,7 +59,6 @@ const tileRanges = [
   [21, 21, 103, 99],
 ] as const;
 
-const maxZoom = tileRanges.length - 1;
 const pointZoom = 3;
 const viewStorageKey = "gta6-cz-map:view:v1";
 const clusteringStorageKey = "gta6-cz-map:clustering";
@@ -295,15 +295,24 @@ export default function LeafletGameMap({ hiddenPointIds, canManagePoints }: Game
     const hidden = new Set(hiddenPointIds);
     return mapPoints.filter(({ id }) => !hidden.has(id));
   }, [hiddenPointIds]);
+  const [{ sharedLocation, showLocationMarker }] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      sharedLocation: readMapLocation(Object.fromEntries(params)),
+      showLocationMarker: params.get(mapViewOnlyParam) !== "1",
+    };
+  });
   const [selectedCategories, setSelectedCategories] = useState(allPointCategories);
   const [selection, setSelection] = useState<PointMarkersProps["selection"]>(() => {
     const pointId = new URLSearchParams(window.location.search).get(pointLinkParam);
     const point = points.find(({ id }) => id === pointId);
     return point ? { point } : null;
   });
-  const [initialView] = useState<MapView>(() =>
-    selection ? { center: [selection.point.y, selection.point.x], zoom: pointZoom } : readMapView()
-  );
+  const [initialView] = useState<MapView>(() => {
+    if (selection) return { center: [selection.point.y, selection.point.x], zoom: pointZoom };
+    if (sharedLocation) return { center: [sharedLocation.y, sharedLocation.x], zoom: sharedLocation.zoom };
+    return readMapView();
+  });
   const [clustering, setClustering] = useState(() => {
     try {
       return window.localStorage.getItem(clusteringStorageKey) !== "false";
@@ -361,6 +370,7 @@ export default function LeafletGameMap({ hiddenPointIds, canManagePoints }: Game
           stroke={false}
           fillOpacity={1}
         />
+        <MapLocationMenu sharedLocation={!selection && showLocationMarker ? sharedLocation : null} />
         <PointMarkers
           points={points}
           canManagePoints={canManagePoints}

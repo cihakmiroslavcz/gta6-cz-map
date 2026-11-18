@@ -36,15 +36,19 @@ export async function getMapAdminClient() {
   return client && await isMapAdmin(client) ? client : null;
 }
 
-export async function readHiddenPointIds() {
-  if (!supabaseConfig) return [];
-
-  const client = createClient(supabaseConfig.url, supabaseConfig.publishableKey, {
+export function createPublicClient() {
+  if (!supabaseConfig) return null;
+  return createClient(supabaseConfig.url, supabaseConfig.publishableKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     global: {
       fetch: (url, init) => fetch(url, { ...init, cache: "no-store" }),
     },
   });
+}
+
+export async function readHiddenPointIds() {
+  const client = createPublicClient();
+  if (!client) return [];
   const { data, error } = await client.from("map_hidden_points").select("point_id");
 
   if (error) {

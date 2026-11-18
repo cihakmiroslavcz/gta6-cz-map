@@ -504,6 +504,66 @@ body {
   background: #193e5aee;
 }
 
+.game-map .map-location-popup .leaflet-popup-content-wrapper {
+  border-radius: var(--space-4);
+}
+
+.map-location-marker {
+  fill: var(--map-switch-on);
+}
+
+.game-map .map-location-popup .leaflet-popup-content {
+  width: min(232px, calc(100vw - 44px));
+  max-width: min(232px, calc(100vw - 44px));
+}
+
+.map-location-actions {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  font: 650 var(--map-control-size) / var(--map-control-line) var(--font-ui);
+}
+
+.map-location-actions button,
+.game-map .map-location-actions a {
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-1) var(--space-3);
+  border: 0;
+  border-radius: var(--space-2);
+  background: transparent;
+  color: var(--glass-ink);
+  font: inherit;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.map-location-actions :is(a, button):hover {
+  background: #9de5ff25;
+}
+
+.map-location-actions :is(a, button, input):focus-visible {
+  outline: 2px solid #b9ebff;
+  outline-offset: -2px;
+}
+
+.map-location-actions :is(label, [role="status"]) {
+  padding: var(--space-2);
+  color: var(--glass-muted);
+  font-size: var(--type-caption-size);
+}
+
+.map-location-actions input {
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: var(--space-1);
+  padding: var(--space-2);
+  font: inherit;
+}
+
 .game-map a.leaflet-popup-close-button {
   display: grid;
   place-items: center;

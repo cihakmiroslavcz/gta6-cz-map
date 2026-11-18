@@ -4,6 +4,7 @@ import { mapPoints, pointLinkParam } from "@/components/map/map-points";
 import { supabaseConfig } from "@/lib/supabase/config";
 import { getMapAdminClient } from "@/lib/supabase/map-server";
 import { restorePoint, signIn, signOut } from "./actions";
+import SuggestionList from "./SuggestionList";
 import styles from "./admin.module.css";
 
 export const metadata: Metadata = {
@@ -67,6 +68,7 @@ async function AdminContent({ searchParams }: Pick<AdminPageProps, "searchParams
           ))}
         </ul>
       )}
+      <SuggestionList client={client} pageValue={params.navrhy} />
     </>
   );
 }

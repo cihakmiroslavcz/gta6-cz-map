@@ -27,11 +27,13 @@ Obecné názvy bodů se překládají podle seznamu `genericPointNames` v `compo
 
 Body bez zařazení jsou dočasně vyřazené z mapy, vyhledávání i přehledu kategorií. Zdrojový soubor je dál obsahuje.
 
-## Hlášení chyb
+## Hlášení chyb a návrhy míst
 
 Tlačítko **Nahlásit chybu** v detailu bodu otevře formulář na `/nahlasit-chybu` s názvem a ID bodu, odkazem na produkční mapu a herními souřadnicemi. Výchozí adresa pro hlášení a kontakt je `gta6czmap@gmail.com`. Pro jiné prostředí ji lze před buildem změnit proměnnou `NEXT_PUBLIC_MAP_REPORT_EMAIL`.
 
 Formulář doručuje zprávy přes [FormSubmit](https://formsubmit.co/). Po prvním odeslání z produkční mapy potvrď aktivaci od FormSubmit v projektové schránce, aby služba začala zprávy doručovat.
+
+Pravé kliknutí nebo klepnutí na volné místo na mapě otevře nabídku s návrhem nového místa a kopírováním odkazu na souřadnice. Návrhy míst se ukládají do Supabase a zobrazují se pouze správci na `/admin`.
 
 ## Správa bodů v Supabase
 
@@ -48,6 +50,8 @@ Formulář doručuje zprávy přes [FormSubmit](https://formsubmit.co/). Po prvn
 4. Přihlas se na `/admin`, otevři mapu a v detailu pinu zvol **Skrýt bod**. Na `/admin` můžeš skrytý bod obnovit.
 
 Tabulka skrytých bodů ukládá jen jejich ID. Databázové zásady umožňují veřejné čtení ID a upravovat tabulku mohou pouze přihlášení správci.
+
+Pro ukládání návrhů míst spusť také [migraci map_suggestions.sql](supabase/migrations/20261118000001_map_suggestions.sql). Veřejný formulář může návrh vložit a uložené návrhy smí číst pouze správce.
 
 ## Písmo a ikony
 

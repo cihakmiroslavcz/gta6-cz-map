@@ -1,30 +1,29 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import { Suspense } from "react";
 import MaterialIcon from "@/components/MaterialIcon";
+import { MapFeedbackForm, MapFeedbackPage } from "@/components/MapFeedback";
 import { mapPoints, pointLinkParam, type MapPoint } from "@/components/map/map-points";
-import { mapContactEmail } from "@/lib/map-contact";
+import { publicMapOrigin } from "@/lib/map-contact";
 import { readHiddenPointIds } from "@/lib/supabase/map-server";
-import styles from "./report.module.css";
+import styles from "@/app/map-feedback.module.css";
 
 export const metadata: Metadata = {
   title: "Nahlásit chybu | GTA VI Interaktivní mapa",
 };
-
-const publicMapOrigin = "https://gta6-cz-map.vercel.app";
 
 type ReportPageProps = PageProps<"/nahlasit-chybu">;
 
 function ReportForm({ point, mapHref }: { point: MapPoint; mapHref: string }) {
   const coordinates = `X ${point.x}, Y ${point.y}`;
   const mapUrl = new URL(mapHref, publicMapOrigin);
-  const returnUrl = new URL("/nahlasit-chybu", publicMapOrigin);
-  returnUrl.searchParams.set(pointLinkParam, point.id);
-  returnUrl.searchParams.set("odeslano", "1");
-  const recipient = encodeURIComponent(mapContactEmail).replace("%40", "@");
+  const returnParams = new URLSearchParams({ [pointLinkParam]: point.id, odeslano: "1" });
 
   return (
-    <form className={styles.form} action={`https://formsubmit.co/${recipient}`} method="post" aria-label="Hlášení chyby">
+    <MapFeedbackForm
+      label="Hlášení chyby"
+      subject={`Chyba na mapě: ${point.name}`}
+      returnHref={`/nahlasit-chybu?${returnParams}`}
+      submitLabel="Odeslat hlášení"
+    >
       <dl className={styles.point}>
         <div>
           <dt>Bod</dt>
@@ -40,8 +39,6 @@ function ReportForm({ point, mapHref }: { point: MapPoint; mapHref: string }) {
         </div>
       </dl>
 
-      <input type="hidden" name="_subject" value={`Chyba na mapě: ${point.name}`} />
-      <input type="hidden" name="_next" value={returnUrl.href} />
       <input type="hidden" name="Bod" value={point.name} />
       <input type="hidden" name="ID bodu" value={point.id} />
       <input type="hidden" name="Odkaz na mapu" value={mapUrl.href} />
@@ -63,11 +60,7 @@ function ReportForm({ point, mapHref }: { point: MapPoint; mapHref: string }) {
         </p>
       </div>
 
-      <button className={styles.submit} type="submit">Odeslat hlášení</button>
-      <p className={styles.note}>
-        Hlášení zpracovává <a href="https://formsubmit.co/">FormSubmit</a>.
-      </p>
-    </form>
+    </MapFeedbackForm>
   );
 }
 
@@ -98,21 +91,8 @@ async function ReportContent({ searchParams }: Pick<ReportPageProps, "searchPara
 
 export default function ReportPage({ searchParams }: ReportPageProps) {
   return (
-    <main className={styles.page}>
-      <section className={`map-glass ${styles.panel}`} aria-labelledby="report-title">
-        <Image
-          className={styles.logo}
-          src="/logo/gta6-cz-map-logo.svg"
-          alt="GTA VI Interaktivní mapa"
-          width={216}
-          height={54}
-          unoptimized
-        />
-        <h1 id="report-title">Nahlásit chybu</h1>
-        <Suspense fallback={<p role="status">Načítám údaje o bodu…</p>}>
-          <ReportContent searchParams={searchParams} />
-        </Suspense>
-      </section>
-    </main>
+    <MapFeedbackPage title="Nahlásit chybu">
+      <ReportContent searchParams={searchParams} />
+    </MapFeedbackPage>
   );
 }

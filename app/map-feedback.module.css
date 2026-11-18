@@ -100,10 +100,11 @@
   overflow-wrap: anywhere;
 }
 
+.field input,
 .field textarea {
   box-sizing: border-box;
   width: 100%;
-  min-height: 120px;
+  min-height: 44px;
   padding: var(--space-3);
   border: 1px solid var(--glass-edge);
   border-radius: var(--space-3);
@@ -111,6 +112,10 @@
   color: var(--glass-ink);
   font: inherit;
   line-height: var(--map-input-line);
+}
+
+.field textarea {
+  min-height: 120px;
   resize: vertical;
 }
 
@@ -131,7 +136,12 @@
   background: var(--point-action-hover);
 }
 
-.panel :is(a, button, textarea):focus-visible {
+.submit:disabled {
+  opacity: 0.65;
+  cursor: progress;
+}
+
+.panel :is(a, button, input, textarea):focus-visible {
   outline: 2px solid #b9ebff;
   outline-offset: var(--space-1);
 }
