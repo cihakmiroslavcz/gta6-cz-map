@@ -15,7 +15,7 @@ Mapu otevři na [localhost:3000](http://localhost:3000).
 
 Aplikace používá sadu `yanis,18` z GTADB. Ve složce `public/maps/tiles/6/yanis,18/` mají být adresáře `0` až `5` s JPEG dlaždicemi o rozměrech 256 × 256 px. Příklad cesty je `public/maps/tiles/6/yanis,18/0/0,0,0.jpg`.
 
-Dlaždice jsou v projektu určené pro místní použití a Git je ignoruje. Pokud chybí, stáhni si v samostatné složce příslušnou sadu z [repozitáře GTADB](https://github.com/rolux/gtadb.org) a zkopíruj ji do uvedené cesty.
+Git místní dlaždice ignoruje. Pokud dlaždice v uvedené cestě chybí, Next.js ji načte z [hostingu GTADB](https://map.gtadb.org/). Produkční mapa tak funguje i při nasazení z GitHubu bez dlaždic v repozitáři a v takovém případě závisí na dostupnosti GTADB.
 
 Podklady Yanis V18 poskytuje gtadb.org pod licencí [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Aplikace při vykreslení zakrývá původní postranní panel. [Kredity autorů](public/maps/yanis-v18-kredity.jpg) jsou dostupné v Nastavení → Kredity.
 
