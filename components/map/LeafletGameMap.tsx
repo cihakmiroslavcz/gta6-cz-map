@@ -268,7 +268,7 @@ function PointMarkers({ points, canManagePoints, selectedCategories, selection, 
         else markers.current.delete(point.id);
       }}
       position={[point.y, point.x]}
-      icon={pointIcons.get(point.id)}
+      icon={pointIcons.get(point.id) ?? pointIcon(point)}
       title={point.name}
     >
       <Popup maxWidth={320} autoPanPaddingTopLeft={[16, 152]} autoPanPaddingBottomRight={[16, 136]}>
@@ -290,11 +290,11 @@ function PointMarkers({ points, canManagePoints, selectedCategories, selection, 
   ) : visibleMarkers;
 }
 
-export default function LeafletGameMap({ hiddenPointIds, canManagePoints }: GameMapProps) {
+export default function LeafletGameMap({ hiddenPointIds, approvedPoints, canManagePoints }: GameMapProps) {
   const points = useMemo(() => {
     const hidden = new Set(hiddenPointIds);
-    return mapPoints.filter(({ id }) => !hidden.has(id));
-  }, [hiddenPointIds]);
+    return [...mapPoints, ...approvedPoints].filter(({ id }) => !hidden.has(id));
+  }, [approvedPoints, hiddenPointIds]);
   const [{ sharedLocation, showLocationMarker }] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     return {

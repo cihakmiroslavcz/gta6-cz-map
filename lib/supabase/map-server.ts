@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import { isPublishedPointCategory, isPublishedPointType, type MapPoint } from "@/components/map/map-points";
+import { isSuggestionId, suggestionPointId } from "@/lib/map-point-id";
 import { sessionCookieOptions, supabaseConfig } from "./config";
 
 export async function createSessionClient() {
@@ -57,4 +59,48 @@ export async function readHiddenPointIds() {
   }
 
   return data.map(({ point_id }) => String(point_id));
+}
+
+export async function readApprovedPoints(suggestionId?: string): Promise<MapPoint[] | null> {
+  const client = createPublicClient();
+  if (!client) return [];
+
+  const points: MapPoint[] = [];
+  const pageSize = 1000;
+  let after: string | undefined;
+
+  do {
+    const query = client.from("map_suggestion_reviews")
+      .select("suggestion_id,name,description,category,type,x,y")
+      .eq("decision", "approved")
+      .order("suggestion_id")
+      .limit(pageSize);
+    if (suggestionId) query.eq("suggestion_id", suggestionId);
+    if (after) query.gt("suggestion_id", after);
+    const { data, error } = await query;
+    if (error) {
+      // Keep serving the existing map until the review migration is applied.
+      if (error.code === "PGRST205" || error.code === "42P01") return [];
+      console.error("Could not read map_suggestion_reviews", error.code);
+      return null;
+    }
+
+    for (const row of data) {
+      if (!isSuggestionId(row.suggestion_id) || !isPublishedPointCategory(row.category) || !isPublishedPointType(row.type)) {
+        continue;
+      }
+      points.push({
+        id: suggestionPointId(row.suggestion_id),
+        name: row.name,
+        description: row.description,
+        category: row.category,
+        type: row.type,
+        x: Number(row.x),
+        y: Number(row.y),
+      });
+    }
+    after = data.length === pageSize ? data.at(-1)?.suggestion_id : undefined;
+  } while (after);
+
+  return points;
 }

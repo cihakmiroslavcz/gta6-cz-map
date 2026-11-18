@@ -1,9 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import type { MapPoint } from "./map-points";
 
 export type GameMapProps = {
   hiddenPointIds: string[];
+  approvedPoints: MapPoint[];
   canManagePoints: boolean;
 };
 

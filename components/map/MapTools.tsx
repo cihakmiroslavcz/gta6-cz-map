@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import MaterialIcon from "@/components/MaterialIcon";
 import { mapContactEmail } from "@/lib/map-contact";
+import { isMapPointId } from "@/lib/map-point-id";
 import MapFilters, { type MapFiltersProps } from "./MapFilters";
 import { countPointCategories, pointCategories, pointTypes, type MapPoint } from "./map-points";
 
@@ -79,7 +80,7 @@ export default function MapTools({
   const categoryCounts = useMemo(() => countPointCategories(points), [points]);
   const searchTerm = normalizeSearch(query);
   const searchWords = searchTerm.split(" ");
-  const exactPoint = /^l\d+$/.test(searchTerm)
+  const exactPoint = isMapPointId(searchTerm.charAt(0).toUpperCase() + searchTerm.slice(1))
     ? points.find(({ id }) => id.toLowerCase() === searchTerm)
     : undefined;
   const results = exactPoint ? [exactPoint] : searchTerm

@@ -53,6 +53,8 @@ Tabulka skrytých bodů ukládá jen jejich ID. Databázové zásady umožňují
 
 Pro ukládání návrhů míst spusť také [migraci map_suggestions.sql](supabase/migrations/20261118000001_map_suggestions.sql). Veřejný formulář může návrh vložit a uložené návrhy smí číst pouze správce.
 
+Pro schvalování spusť [migraci map_suggestion_reviews.sql](supabase/migrations/20261118000002_map_suggestion_reviews.sql). Na `/admin` otevři **Posoudit návrh**, uprav veřejný název a popis, vyber kategorii a typ a zvol **Schválit a přidat na mapu**. Zveřejněný pin má vlastní odkaz a lze jej skrýt nebo obnovit stejně jako body GTADB.
+
 ## Písmo a ikony
 
 [Onest](https://github.com/google/fonts/tree/main/ofl/onest) je pod licencí SIL Open Font License 1.1. [Google Material Symbols Rounded](https://developers.google.com/fonts/docs/material_symbols) jsou pod licencí Apache 2.0. Projekt používá místní výběr ikon. Texty licencí jsou ve složce `app/fonts/`.

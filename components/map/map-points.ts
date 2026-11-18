@@ -72,6 +72,14 @@ export type MapPoint = {
   y: number;
 };
 
+export function isPublishedPointCategory(value: unknown): value is Exclude<PointCategory, "uncategorized"> {
+  return typeof value === "string" && value !== "uncategorized" && Object.hasOwn(pointCategories, value);
+}
+
+export function isPublishedPointType(value: unknown): value is Exclude<MapPoint["type"], "unknown"> {
+  return typeof value === "string" && value !== "unknown" && Object.hasOwn(pointTypes, value);
+}
+
 // GTADB landmark IDs and game coordinates. Values are rounded to tenths of a meter.
 const curatedPoints: MapPoint[] = [
   {

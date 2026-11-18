@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { mapPoints, pointLinkParam } from "@/components/map/map-points";
 import { supabaseConfig } from "@/lib/supabase/config";
-import { getMapAdminClient } from "@/lib/supabase/map-server";
+import { getMapAdminClient, readApprovedPoints } from "@/lib/supabase/map-server";
 import { restorePoint, signIn, signOut } from "./actions";
 import SuggestionList from "./SuggestionList";
 import styles from "./admin.module.css";
@@ -36,7 +36,12 @@ async function AdminContent({ searchParams }: Pick<AdminPageProps, "searchParams
     );
   }
 
-  const { data, error } = await client.from("map_hidden_points").select("point_id").order("point_id");
+  const [{ data, error }, approvedPoints] = await Promise.all([
+    client.from("map_hidden_points").select("point_id").order("point_id"),
+    readApprovedPoints(),
+  ]);
+  const hiddenPointNames = new Map(pointNames);
+  for (const { id, name } of approvedPoints ?? []) hiddenPointNames.set(id, name);
   return (
     <>
       <div className={styles.toolbar}>
@@ -57,10 +62,10 @@ async function AdminContent({ searchParams }: Pick<AdminPageProps, "searchParams
         <ul className={styles.points}>
           {data.map(({ point_id: id }) => (
             <li key={id}>
-              <span>{pointNames.get(id) ?? "Bod mimo aktuální data"} <small>{id}</small></span>
+              <span>{hiddenPointNames.get(id) ?? "Bod mimo aktuální data"} <small>{id}</small></span>
               <form action={restorePoint}>
                 <input type="hidden" name={pointLinkParam} value={id} />
-                <button type="submit" className={styles.control} aria-label={`Obnovit bod ${pointNames.get(id) ?? id}`}>
+                <button type="submit" className={styles.control} aria-label={`Obnovit bod ${hiddenPointNames.get(id) ?? id}`}>
                   Obnovit
                 </button>
               </form>

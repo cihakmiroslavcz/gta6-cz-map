@@ -3,7 +3,8 @@ import MaterialIcon from "@/components/MaterialIcon";
 import { MapFeedbackForm, MapFeedbackPage } from "@/components/MapFeedback";
 import { mapPoints, pointLinkParam, type MapPoint } from "@/components/map/map-points";
 import { publicMapOrigin } from "@/lib/map-contact";
-import { readHiddenPointIds } from "@/lib/supabase/map-server";
+import { isMapPointId } from "@/lib/map-point-id";
+import { readApprovedPoints, readHiddenPointIds } from "@/lib/supabase/map-server";
 import styles from "@/app/map-feedback.module.css";
 
 export const metadata: Metadata = {
@@ -65,10 +66,15 @@ function ReportForm({ point, mapHref }: { point: MapPoint; mapHref: string }) {
 }
 
 async function ReportContent({ searchParams }: Pick<ReportPageProps, "searchParams">) {
-  const [params, hiddenPointIds] = await Promise.all([searchParams, readHiddenPointIds()]);
-  if (!hiddenPointIds) return <p>Údaje o bodu se nepodařilo načíst. Zkus obnovit stránku.</p>;
+  const params = await searchParams;
   const pointId = params[pointLinkParam];
-  const point = mapPoints.find(({ id }) => id === pointId && !hiddenPointIds.includes(id));
+  const approvedId = isMapPointId(pointId) && pointId.startsWith("S") ? pointId.slice(1) : null;
+  const [hiddenPointIds, approvedPoints] = await Promise.all([
+    readHiddenPointIds(), approvedId ? readApprovedPoints(approvedId) : [],
+  ]);
+  if (!hiddenPointIds || !approvedPoints) return <p>Údaje o bodu se nepodařilo načíst. Zkus obnovit stránku.</p>;
+  const points = approvedId ? approvedPoints : mapPoints;
+  const point = points.find(({ id }) => id === pointId && !hiddenPointIds.includes(id));
   const mapHref = point ? `/?${new URLSearchParams({ [pointLinkParam]: point.id })}` : "/";
 
   return (
