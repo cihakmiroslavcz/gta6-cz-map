@@ -1,0 +1,282 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import MaterialIcon from "@/components/MaterialIcon";
+import MapFilters, { type MapFiltersProps } from "./MapFilters";
+import { mapPoints, pointCategories, pointCategoryCounts, pointTypes, type MapPoint } from "./map-points";
+
+const legendSections = [
+  {
+    title: "Silnice a železnice",
+    items: [
+      { label: "Dálnice", swatch: 0 },
+      { label: "Silnice", swatch: 1 },
+      { label: "Ulička", swatch: 2 },
+      { label: "Pěšina", swatch: 3 },
+      { label: "Nezpevněná cesta", swatch: 4 },
+      { label: "Železnice", swatch: 5 },
+      { label: "Městská železnice (Metrorail)", swatch: 6 },
+      { label: "Městská dráha (Metromover)", swatch: 7 },
+    ],
+  },
+  {
+    title: "Terén",
+    items: [
+      { label: "Průmyslová zóna", swatch: 8 },
+      { label: "Městská zástavba", swatch: 9 },
+      { label: "Park", swatch: 10 },
+      { label: "Pláž a písek", swatch: 11 },
+      { label: "Mokřady", swatch: 12 },
+      { label: "Zemědělská půda", swatch: 13 },
+    ],
+  },
+];
+
+type MapToolsProps = MapFiltersProps & {
+  onPointSelect: (point: MapPoint) => void;
+  clustering: boolean;
+  onClusteringChange: (enabled: boolean) => void;
+};
+
+function normalizeSearch(text: string) {
+  return text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("cs-CZ")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+const searchablePoints = mapPoints.map((point) => {
+  const { label, aliases } = pointTypes[point.type];
+  return {
+    point,
+    searchText: normalizeSearch([
+      point.id, point.name, point.sourceName, point.location, label, pointCategories[point.category], ...aliases,
+    ].join(" ")),
+  };
+});
+
+const searchLimit = 40;
+const contactEmail = process.env.NEXT_PUBLIC_MAP_REPORT_EMAIL?.trim();
+
+export default function MapTools({
+  selectedCategories,
+  onCategoryChange,
+  onPointSelect,
+  clustering,
+  onClusteringChange,
+}: MapToolsProps) {
+  const [openPanel, setOpenPanel] = useState<"search" | "filters" | "legend" | "settings" | null>(null);
+  const [query, setQuery] = useState("");
+  const searchPanel = useRef<HTMLDivElement>(null);
+  const searchInput = useRef<HTMLInputElement>(null);
+  const searchTerm = normalizeSearch(query);
+  const searchWords = searchTerm.split(" ");
+  const exactPoint = /^l\d+$/.test(searchTerm)
+    ? mapPoints.find(({ id }) => id.toLowerCase() === searchTerm)
+    : undefined;
+  const results = exactPoint ? [exactPoint] : searchTerm
+    ? searchablePoints
+      .filter(({ searchText }) => searchWords.every((word) => searchText.includes(word)))
+      .map(({ point }) => point)
+    : [];
+
+  useEffect(() => {
+    if (openPanel !== "search") return;
+
+    function closeOnOutsidePress(event: PointerEvent) {
+      if (event.target instanceof Node && !searchPanel.current?.contains(event.target)) {
+        setOpenPanel(null);
+      }
+    }
+
+    document.addEventListener("pointerdown", closeOnOutsidePress, true);
+    return () => document.removeEventListener("pointerdown", closeOnOutsidePress, true);
+  }, [openPanel]);
+
+  function selectPoint(point: MapPoint) {
+    onPointSelect(point);
+    setOpenPanel(null);
+    searchInput.current?.blur();
+  }
+
+  return (
+    <aside className="map-hud" aria-label="Nástroje mapy">
+      <div className="map-search" ref={searchPanel}>
+        <form
+          className="map-search-field map-glass"
+          role="search"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (results[0]) selectPoint(results[0]);
+          }}
+        >
+          <MaterialIcon name="search" />
+          <input
+            id="map-search-input"
+            ref={searchInput}
+            type="search"
+            aria-label="Název nebo typ místa"
+            aria-controls="map-search-panel"
+            placeholder="Místo nebo typ"
+            value={query}
+            onFocus={() => setOpenPanel("search")}
+            onClick={() => setOpenPanel("search")}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setOpenPanel("search");
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") setOpenPanel(null);
+            }}
+          />
+        </form>
+        <div
+          id="map-search-panel"
+          className="map-tools-panel map-glass map-search-results"
+          hidden={openPanel !== "search" || !searchTerm}
+        >
+          {results.length > 0 ? (
+            <ul aria-label="Výsledky hledání">
+              {results.slice(0, searchLimit).map((point) => (
+                <li key={point.id}>
+                  <button type="button" onClick={() => selectPoint(point)}>
+                    {point.name}
+                    <small>{point.sourceName && point.location ? point.location : pointTypes[point.type].label}</small>
+                    {!selectedCategories[point.category] && (
+                      <small>Skryto filtrem · výběr zapne kategorii</small>
+                    )}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="map-search-empty" role="status">Žádné místo nenalezeno.</p>
+          )}
+          {results.length > searchLimit && (
+            <p className="map-search-empty" role="status">
+              Zobrazeno {searchLimit} z {results.length} výsledků. Hledání můžeš upřesnit názvem nebo oblastí.
+            </p>
+          )}
+        </div>
+      </div>
+      <div className="map-tools">
+        <div className="map-tools-buttons map-glass">
+          <button
+            type="button"
+            aria-label="Filtry"
+            aria-controls="map-filter-panel"
+            aria-expanded={openPanel === "filters"}
+            onClick={() => setOpenPanel(openPanel === "filters" ? null : "filters")}
+          >
+            <MaterialIcon name="filter_list" />
+            <span className="map-tool-label">Filtry</span>
+          </button>
+          <button
+            type="button"
+            aria-label="Legenda"
+            aria-controls="map-legend-panel"
+            aria-expanded={openPanel === "legend"}
+            onClick={() => setOpenPanel(openPanel === "legend" ? null : "legend")}
+          >
+            <MaterialIcon name="map" />
+            <span className="map-tool-label">Legenda</span>
+          </button>
+          <button
+            type="button"
+            aria-label="Nastavení"
+            aria-controls="map-settings-panel"
+            aria-expanded={openPanel === "settings"}
+            onClick={() => setOpenPanel(openPanel === "settings" ? null : "settings")}
+          >
+            <MaterialIcon name="settings" />
+            <span className="map-tool-label">Nastavení</span>
+          </button>
+        </div>
+        <div id="map-filter-panel" className="map-tools-panel map-glass" hidden={openPanel !== "filters"}>
+          <MapFilters
+            selectedCategories={selectedCategories}
+            onCategoryChange={onCategoryChange}
+            categoryCounts={pointCategoryCounts}
+          />
+        </div>
+        <div id="map-legend-panel" className="map-tools-panel map-glass" hidden={openPanel !== "legend"}>
+          {legendSections.map(({ title, items }) => (
+            <section className="map-legend-section" key={title}>
+              <h2>{title}</h2>
+              <ul>
+                {items.map(({ label, swatch }) => (
+                  <li key={swatch}>
+                    <span
+                      className="legend-swatch"
+                      style={{ backgroundPositionY: `calc(var(--legend-swatch-height) * ${-swatch})` }}
+                      aria-hidden="true"
+                    />
+                    {label}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+        <section
+          id="map-settings-panel"
+          className="map-settings-panel map-tools-panel map-glass"
+          aria-labelledby="map-settings-title"
+          hidden={openPanel !== "settings"}
+        >
+          <h2 id="map-settings-title">Nastavení</h2>
+          <label className="map-filter-option">
+            <span>Seskupovat značky</span>
+            <input
+              className="map-switch"
+              type="checkbox"
+              role="switch"
+              checked={clustering}
+              onChange={(event) => onClusteringChange(event.target.checked)}
+            />
+          </label>
+          <div className="map-settings-section">
+            <h3>O projektu</h3>
+            <p>
+              GTA VI Interaktivní mapa je neoficiální fanouškovský projekt. Není spojený
+              se společnostmi Rockstar Games ani Take-Two Interactive Software, Inc.
+            </p>
+            <p>
+              <a href="https://www.rockstargames.com/">Rockstar Games</a> a{" "}
+              <a href="https://www.rockstargames.com/gta-vi">Grand Theft Auto</a> jsou ochranné
+              známky společnosti <a href="https://www.take2games.com/">Take-Two Interactive Software, Inc.</a>
+            </p>
+          </div>
+          {contactEmail && (
+            <div className="map-settings-section">
+              <h3>Kontakt</h3>
+              <p>
+                Dotazy, připomínky a návrhy na doplnění mapy nám můžeš poslat na{" "}
+                <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
+              </p>
+            </div>
+          )}
+          <div className="map-settings-section">
+            <h3>Kredity</h3>
+            <p>
+              Mapový podklad <a href="/maps/yanis-v18-kredity.jpg">Yanis V18 a kredity autorů</a>.{" "}
+              © 2025–2026 <a href="https://map.gtadb.org/">GTADB.ORG a přispěvatelé</a>. Licence{" "}
+              <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+              Původní postranní panel mapy je zakrytý.
+            </p>
+            <p>
+              Data bodů vytvořili <a href="https://github.com/rolux/gtadb.org/blob/main/map/data/6/landmarks.json">GTADB
+              a přispěvatelé</a> pod licencí{" "}
+              <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Kategorie a popisky jsou upravené.
+            </p>
+          </div>
+          <footer className="map-settings-copyright">
+            © 2026 GTA VI Interaktivní mapa · Rozhraní a české texty
+          </footer>
+        </section>
+      </div>
+    </aside>
+  );
+}

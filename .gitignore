@@ -10,6 +10,9 @@
 !.yarn/releases
 !.yarn/versions
 
+# local GTADB map tiles
+/public/maps/tiles/6/
+
 # testing
 /coverage
 

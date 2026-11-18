@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GTA6 CZ Map
 
-## Getting Started
+Česká interaktivní komunitní mapa Grand Theft Auto VI.
 
-First, run the development server:
+## Místní spuštění
 
-```bash
+```sh
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Mapu otevři na [localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Mapové podklady
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Aplikace používá sadu `yanis,18` z GTADB. Ve složce `public/maps/tiles/6/yanis,18/` mají být adresáře `0` až `5` s JPEG dlaždicemi o rozměrech 256 × 256 px. Příklad cesty je `public/maps/tiles/6/yanis,18/0/0,0,0.jpg`.
 
-## Learn More
+Dlaždice jsou v projektu určené pro místní použití a Git je ignoruje. Pokud chybí, stáhni si v samostatné složce příslušnou sadu z [repozitáře GTADB](https://github.com/rolux/gtadb.org) a zkopíruj ji do uvedené cesty.
 
-To learn more about Next.js, take a look at the following resources:
+Podklady Yanis V18 poskytuje gtadb.org pod licencí [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Aplikace při vykreslení zakrývá původní postranní panel. [Kredity autorů](public/maps/yanis-v18-kredity.jpg) jsou dostupné v Nastavení → Kredity.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Body zájmu a legenda
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Mapa používá výběr z [dat GTADB pro GTA VI](https://github.com/rolux/gtadb.org/blob/main/map/data/6/landmarks.json) z 18. listopadu 2026 v souboru `components/map/gtadb-points.json`. Výběr obsahuje 946 míst, která mají název i herní souřadnice. Souřadnice jsou zaokrouhlené na desetiny metru, značky mají české kategorie odvozené ze zdrojových štítků a ručně upravená místa jsou v `components/map/map-points.ts`. Data vytvořili gtadb.org a přispěvatelé pod licencí [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Česká legenda používá výřezy symbolů z původní legendy Yanis V18.
 
-## Deploy on Vercel
+Obecné názvy bodů se překládají podle seznamu `genericPointNames` v `components/map/map-points.ts` při shodě celého názvu. Vlastní jména, názvy podniků a značky zůstávají ve zdrojovém znění. Přeložený bod lze najít i podle původního názvu.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Body bez zařazení jsou dočasně vyřazené z mapy, vyhledávání i přehledu kategorií. Zdrojový soubor je dál obsahuje.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Hlášení chyb
+
+Pro zobrazení tlačítka **Nahlásit chybu** v detailu bodu nastav veřejnou e-mailovou adresu projektu v proměnné `NEXT_PUBLIC_MAP_REPORT_EMAIL`. Pro místní vývoj ji přidej do `.env.local` a restartuj vývojový server. Na Vercelu ji nastav pro příslušné prostředí před buildem. Tlačítko otevře formulář na `/nahlasit-chybu` s názvem a ID bodu, odkazem na produkční mapu a herními souřadnicemi.
+
+Formulář doručuje zprávy přes [FormSubmit](https://formsubmit.co/). Po prvním odeslání z produkční mapy potvrď aktivaci od FormSubmit v projektové schránce, aby služba začala zprávy doručovat.
+
+## Písmo a ikony
+
+[Onest](https://github.com/google/fonts/tree/main/ofl/onest) je pod licencí SIL Open Font License 1.1. [Google Material Symbols Rounded](https://developers.google.com/fonts/docs/material_symbols) jsou pod licencí Apache 2.0. Projekt používá místní výběr ikon. Texty licencí jsou ve složce `app/fonts/`.
