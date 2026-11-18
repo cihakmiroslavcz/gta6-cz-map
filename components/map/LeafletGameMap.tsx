@@ -347,8 +347,10 @@ export default function LeafletGameMap() {
         <MapCoordinates />
         <Rectangle
           bounds={sidePanelBounds}
+          className="map-panel-mask"
           interactive={false}
-          pathOptions={{ className: "map-panel-mask", stroke: false, fillOpacity: 1 }}
+          stroke={false}
+          fillOpacity={1}
         />
         <PointMarkers selectedCategories={selectedCategories} selection={selection} clustering={clustering} />
       </MapContainer>
