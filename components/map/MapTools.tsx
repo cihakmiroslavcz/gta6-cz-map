@@ -5,6 +5,7 @@ import MaterialIcon from "@/components/MaterialIcon";
 import { mapContactEmail } from "@/lib/map-contact";
 import { isMapPointId } from "@/lib/map-point-id";
 import MapFilters, { type MapFiltersProps } from "./MapFilters";
+import type { BaseMap, LeonidaStatus, LeonidaVariant } from "./map-basemaps";
 import { getMapFilterType } from "./map-filter-groups";
 import { pointCategories, pointTypes, type MapPoint } from "./map-points";
 
@@ -41,7 +42,92 @@ type MapToolsProps = Omit<MapFiltersProps, "points"> & {
   onPointSelect: (point: MapPoint) => void;
   clustering: boolean;
   onClusteringChange: (enabled: boolean) => void;
+  basemap: {
+    selected: BaseMap;
+    onSelect: (basemap: BaseMap) => void;
+    officialAvailable: boolean;
+    officialStatus: LeonidaStatus;
+    variants: LeonidaVariant[];
+    variant: LeonidaVariant;
+    onVariantChange: (variant: LeonidaVariant) => void;
+    tileError: boolean;
+    comparing: boolean;
+    onComparisonChange: (enabled: boolean) => void;
+    opacity: number;
+    onOpacityChange: (opacity: number) => void;
+  };
 };
+
+function BasemapSettings({
+  selected, onSelect, officialAvailable, officialStatus, variants, variant,
+  onVariantChange, tileError, comparing, onComparisonChange, opacity, onOpacityChange,
+}: MapToolsProps["basemap"]) {
+  const showOfficial = selected === "official" || comparing;
+
+  return (
+    <div className="map-settings-section map-basemap-settings">
+      <h3 id="map-basemap-title">Mapový podklad</h3>
+      <div className="map-basemap-options" role="radiogroup" aria-labelledby="map-basemap-title">
+        {([
+          { value: "community", label: "Neoficiální mapa" },
+          { value: "official", label: "Oficiální mapa" },
+        ] as const).map(({ value, label }) => (
+          <label className="map-basemap-option" key={value}>
+            <input
+              type="radio"
+              name="map-basemap"
+              value={value}
+              checked={selected === value}
+              disabled={value === "official" && !officialAvailable}
+              onChange={() => onSelect(value)}
+            />
+            {label}
+          </label>
+        ))}
+      </div>
+      {officialStatus === "unavailable" && <p role="status">Oficiální mapa je momentálně nedostupná.</p>}
+      {showOfficial && officialStatus === "loading" && <p role="status">Načítám oficiální mapu…</p>}
+      {showOfficial && tileError && <p role="status">Některé dlaždice chybí. Místo nich se zobrazuje náhled.</p>}
+      <label className="map-filter-option">
+        <span>Překrýt podklady</span>
+        <input
+          className="map-switch"
+          type="checkbox"
+          role="switch"
+          checked={comparing}
+          disabled={!officialAvailable}
+          onChange={(event) => onComparisonChange(event.target.checked)}
+        />
+      </label>
+      {comparing && (
+        <label className="map-basemap-control">
+          <span>Krytí oficiální mapy <output>{opacity} %</output></span>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={opacity}
+            aria-label="Krytí oficiální mapy"
+            onChange={(event) => onOpacityChange(event.target.valueAsNumber)}
+          />
+        </label>
+      )}
+      {showOfficial && variants.length > 1 && (
+        <label className="map-basemap-control">
+          <span>Rozlišení oficiální mapy</span>
+          <select value={variant} onChange={(event) => {
+            const next = variants.find((value) => String(value) === event.target.value);
+            if (next) onVariantChange(next);
+          }}>
+            {variants.map((value) => (
+              <option key={value} value={value}>{value === 1 ? "Původní (1×)" : `Zvětšené (${value}×)`}</option>
+            ))}
+          </select>
+        </label>
+      )}
+    </div>
+  );
+}
 
 function normalizeSearch(text: string) {
   return text
@@ -72,6 +158,7 @@ export default function MapTools({
   onPointSelect,
   clustering,
   onClusteringChange,
+  basemap,
 }: MapToolsProps) {
   const [openPanel, setOpenPanel] = useState<"search" | "filters" | "legend" | "settings" | null>(null);
   const [query, setQuery] = useState("");
@@ -244,6 +331,7 @@ export default function MapTools({
               onChange={(event) => onClusteringChange(event.target.checked)}
             />
           </label>
+          <BasemapSettings {...basemap} />
           {canManagePoints && (
             <div className="map-settings-section">
               <h3>Administrace</h3>
@@ -277,6 +365,7 @@ export default function MapTools({
               <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
               Původní postranní panel mapy je zakrytý.
             </p>
+            <p>Oficiální mapa Leonidy © Rockstar Games.</p>
             <p>
               Data bodů vytvořili <a href="https://github.com/rolux/gtadb.org/blob/main/map/data/6/landmarks.json">GTADB
               a přispěvatelé</a> pod licencí{" "}

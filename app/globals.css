@@ -1097,6 +1097,80 @@ a.point-report:hover {
   text-underline-offset: 2px;
 }
 
+.map-basemap-settings {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.map-basemap-settings h3 {
+  margin: 0;
+}
+
+.map-basemap-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.map-basemap-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--glass-edge);
+  border-radius: 12px;
+  background: #08243a45;
+  cursor: pointer;
+}
+
+.map-basemap-option:has(:checked) {
+  border-color: #ff92cd54;
+  background: linear-gradient(110deg, #ff42ac16, #83d3ff14);
+}
+
+.map-basemap-option input,
+.map-basemap-control input {
+  margin: 0;
+  accent-color: var(--map-switch-on);
+}
+
+.map-basemap-settings label:has(:disabled) {
+  color: var(--glass-muted);
+  cursor: default;
+}
+
+.map-basemap-control {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+}
+
+.map-basemap-control output {
+  float: right;
+  color: var(--glass-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.map-basemap-control input {
+  min-height: 28px;
+}
+
+.map-basemap-control select {
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--glass-edge);
+  border-radius: 12px;
+  background: #092541;
+  color: var(--glass-ink);
+  font: inherit;
+}
+
+.map-basemap-settings :is(input, select):focus-visible {
+  outline: 2px solid var(--glass-ink);
+  outline-offset: 2px;
+}
+
 .map-settings-copyright {
   margin-top: var(--space-4);
   color: var(--glass-muted);

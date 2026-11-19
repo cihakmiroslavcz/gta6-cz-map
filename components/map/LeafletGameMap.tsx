@@ -17,16 +17,25 @@ import {
   type MarkerClusterGroup,
   type Point,
 } from "leaflet";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { MapContainer, Marker, Popup, Rectangle, Tooltip, useMap } from "react-leaflet";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { MapContainer, Marker, Pane, Popup, Rectangle, Tooltip, useMap } from "react-leaflet";
 import ClusterGroup from "react-leaflet-cluster";
 import { mapViewOnlyParam, maxZoom, readMapLocation, worldHalfSize } from "@/lib/map-location";
 import type { GameMapProps } from "./GameMap";
+import LeonidaLayer from "./LeonidaLayer";
 import MapLocationMenu from "./MapLocationMenu";
 import MapTools from "./MapTools";
 import MobileMapDialog from "./MobileMapDialog";
 import PointCard from "./PointCard";
 import PointEditorForm from "./PointEditorForm";
+import {
+  baseMapStorageKey,
+  readLeonidaManifest,
+  type BaseMap,
+  type LeonidaManifest,
+  type LeonidaStatus,
+  type LeonidaVariant,
+} from "./map-basemaps";
 import { getMapFilterType, updateHiddenFilterTypes, type MapFilterType } from "./map-filter-groups";
 import { pointLinkParam, pointTypes, type MapPoint } from "./map-points";
 
@@ -225,8 +234,9 @@ class GtadbTileLayer extends TileLayer {
   }
 }
 
-function MapLayers() {
+function CommunityLayer({ visible }: { visible: boolean }) {
   const map = useMap();
+  const tileLayer = useRef<GtadbTileLayer>(null);
 
   useEffect(() => {
     const tiles = new GtadbTileLayer("", {
@@ -236,6 +246,7 @@ function MapLayers() {
       noWrap: true,
       tileSize,
     }).addTo(map);
+    tileLayer.current = tiles;
     const zoom = new Control.Zoom({
       position: "bottomright",
       zoomInText: '<span class="material-icon" aria-hidden="true">add</span>',
@@ -247,10 +258,27 @@ function MapLayers() {
     return () => {
       zoom.remove();
       tiles.remove();
+      tileLayer.current = null;
     };
   }, [map]);
 
-  return null;
+  useLayoutEffect(() => {
+    tileLayer.current?.setOpacity(visible ? 1 : 0);
+  }, [visible]);
+
+  return (
+    <Pane name="community-mask" style={{ zIndex: 210, pointerEvents: "none" }}>
+      {visible && (
+        <Rectangle
+          bounds={sidePanelBounds}
+          className="map-panel-mask"
+          interactive={false}
+          stroke={false}
+          fillOpacity={1}
+        />
+      )}
+    </Pane>
+  );
 }
 
 type PointMarkersProps = {
@@ -362,6 +390,60 @@ export default function LeafletGameMap({ hiddenPointIds, points: allPoints, canM
       return true;
     }
   });
+  const [baseMap, setBaseMap] = useState<BaseMap>(() => {
+    try {
+      return window.localStorage.getItem(baseMapStorageKey) === "official" ? "official" : "community";
+    } catch {
+      return "community";
+    }
+  });
+  const [manifest, setManifest] = useState<LeonidaManifest | null>(null);
+  const [leonidaStatus, setLeonidaStatus] = useState<LeonidaStatus>("loading");
+  const [leonidaRequested, setLeonidaRequested] = useState(baseMap === "official");
+  const [leonidaVariant, setLeonidaVariant] = useState<LeonidaVariant>(1);
+  const [leonidaTileError, setLeonidaTileError] = useState(false);
+  const [comparing, setComparing] = useState(false);
+  const [comparisonOpacity, setComparisonOpacity] = useState(50);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    readLeonidaManifest(controller.signal)
+      .then((manifest) => {
+        if (!controller.signal.aborted) setManifest(manifest);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setLeonidaStatus("unavailable");
+      });
+    return () => controller.abort();
+  }, []);
+
+  const selectedBaseMap = leonidaStatus === "unavailable" ? "community" : baseMap;
+  const comparisonEnabled = comparing && leonidaStatus !== "unavailable";
+  const officialDisplayed = selectedBaseMap === "official" && leonidaStatus === "ready";
+  const officialOpacity = leonidaStatus !== "ready" ? 0 : comparisonEnabled ? comparisonOpacity / 100 : Number(officialDisplayed);
+
+  function changeBaseMap(next: BaseMap) {
+    setComparing(false);
+    setBaseMap(next);
+    if (next === "official") setLeonidaRequested(true);
+    try {
+      window.localStorage.setItem(baseMapStorageKey, next);
+    } catch {
+      // The preference still works for this visit.
+    }
+  }
+
+  function changeComparison(enabled: boolean) {
+    setComparing(enabled);
+    if (enabled) setLeonidaRequested(true);
+  }
+
+  function changeLeonidaVariant(variant: LeonidaVariant) {
+    setLeonidaTileError(false);
+    setLeonidaVariant(variant);
+  }
+
+  const reportLeonidaTileError = useCallback(() => setLeonidaTileError(true), []);
 
   function changeClustering(enabled: boolean) {
     setClustering(enabled);
@@ -390,6 +472,20 @@ export default function LeafletGameMap({ hiddenPointIds, points: allPoints, canM
         onPointSelect={selectPoint}
         clustering={clustering}
         onClusteringChange={changeClustering}
+        basemap={{
+          selected: selectedBaseMap,
+          onSelect: changeBaseMap,
+          officialAvailable: Boolean(manifest) && leonidaStatus !== "unavailable",
+          officialStatus: leonidaStatus,
+          variants: manifest?.variants ?? [],
+          variant: leonidaVariant,
+          onVariantChange: changeLeonidaVariant,
+          tileError: leonidaTileError,
+          comparing: comparisonEnabled,
+          onComparisonChange: changeComparison,
+          opacity: comparisonOpacity,
+          onOpacityChange: setComparisonOpacity,
+        }}
       />
       <MapContainer
         className="game-map"
@@ -403,16 +499,19 @@ export default function LeafletGameMap({ hiddenPointIds, points: allPoints, canM
         zoomControl={false}
         attributionControl={false}
       >
-        <MapLayers />
+        <CommunityLayer visible={!officialDisplayed || comparisonEnabled} />
+        {manifest && leonidaRequested && (
+          <LeonidaLayer
+            manifest={manifest}
+            variant={leonidaVariant}
+            opacity={officialOpacity}
+            status={leonidaStatus}
+            onStatusChange={setLeonidaStatus}
+            onTileError={reportLeonidaTileError}
+          />
+        )}
         <RememberMapView />
         <MapCoordinates />
-        <Rectangle
-          bounds={sidePanelBounds}
-          className="map-panel-mask"
-          interactive={false}
-          stroke={false}
-          fillOpacity={1}
-        />
         <MapLocationMenu
           sharedLocation={!selection && showLocationMarker ? sharedLocation : null}
           canManagePoints={canManagePoints}
