@@ -5,7 +5,7 @@ import type { MapPoint } from "./map-points";
 
 export type GameMapProps = {
   hiddenPointIds: string[];
-  approvedPoints: MapPoint[];
+  publishedPoints: MapPoint[];
   canManagePoints: boolean;
 };
 

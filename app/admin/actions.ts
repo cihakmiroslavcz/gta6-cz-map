@@ -2,9 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { isPublishedPointCategory, isPublishedPointType, mapPoints, pointLinkParam } from "@/components/map/map-points";
+import { isPublishedPointCategory, isPublishedPointType, mapPoints, pointLinkParam, type MapPoint } from "@/components/map/map-points";
+import { readMapLocation } from "@/lib/map-location";
 import { isMapPointId, isSuggestionId } from "@/lib/map-point-id";
-import { createSessionClient, getMapAdminClient, isMapAdmin, readApprovedPoints } from "@/lib/supabase/map-server";
+import { createSessionClient, getMapAdminClient, isMapAdmin, readPublishedPoints } from "@/lib/supabase/map-server";
 
 export async function signIn(formData: FormData) {
   const client = await createSessionClient();
@@ -36,6 +37,42 @@ function revalidateMap() {
   revalidatePath("/nahlasit-chybu");
 }
 
+type AddPointResult = { point: MapPoint } | { error: string } | null;
+
+export async function addPoint(_previous: AddPointResult, formData: FormData): Promise<AddPointResult> {
+  const client = await getMapAdminClient();
+  if (!client) return { error: "Pro přidání bodu se znovu přihlas jako správce." };
+
+  const location = readMapLocation({ x: formData.get("x"), y: formData.get("y"), z: formData.get("z") });
+  if (!location) return { error: "Vyber místo znovu přímo na mapě." };
+
+  const rawName = formData.get("name");
+  const rawDescription = formData.get("description");
+  const name = typeof rawName === "string" ? rawName.trim() : "";
+  const description = typeof rawDescription === "string" ? rawDescription.trim() : "";
+  const category = formData.get("category");
+  const type = formData.get("type");
+  if (!name || name.length > 120 || description.length > 3000 ||
+    !isPublishedPointCategory(category) || !isPublishedPointType(type)) {
+    return { error: "Zkontroluj název, popis, kategorii a typ bodu." };
+  }
+
+  const { data, error } = await client.from("map_admin_points")
+    .insert({ name, description: description || null, category, type, x: location.x, y: location.y })
+    .select("id,x,y")
+    .single();
+  if (error) {
+    console.error("Could not save map_admin_points", error.code);
+    if (error.code === "PGRST205" || error.code === "42P01") {
+      return { error: "Ukládání bodů vyžaduje migraci databáze map_admin_points." };
+    }
+    return { error: "Bod se nepodařilo uložit. Zkus to znovu." };
+  }
+
+  revalidateMap();
+  return { point: { id: `A${data.id}`, name, description, category, type, x: Number(data.x), y: Number(data.y) } };
+}
+
 export async function hidePoint(_previous: string | null, formData: FormData): Promise<string | null> {
   const client = await getMapAdminClient();
   if (!client) return "Pro skrytí bodu se znovu přihlas jako správce.";
@@ -44,9 +81,9 @@ export async function hidePoint(_previous: string | null, formData: FormData): P
   if (!isMapPointId(pointId)) {
     return "Bod se nepodařilo najít.";
   }
-  const exists = pointId.startsWith("S")
-    ? (await readApprovedPoints(pointId.slice(1)))?.length
-    : mapPoints.some(({ id }) => id === pointId);
+  const exists = pointId.startsWith("L")
+    ? mapPoints.some(({ id }) => id === pointId)
+    : (await readPublishedPoints(pointId))?.length;
   if (!exists) return "Bod se nepodařilo najít.";
 
   const { error } = await client.from("map_hidden_points").upsert(

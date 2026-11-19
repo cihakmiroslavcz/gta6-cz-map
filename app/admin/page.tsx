@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { mapPoints, pointLinkParam } from "@/components/map/map-points";
 import { supabaseConfig } from "@/lib/supabase/config";
-import { getMapAdminClient, readApprovedPoints } from "@/lib/supabase/map-server";
+import { getMapAdminClient, readPublishedPoints } from "@/lib/supabase/map-server";
 import { restorePoint, signIn, signOut } from "./actions";
 import SuggestionList from "./SuggestionList";
 import styles from "./admin.module.css";
@@ -36,12 +36,12 @@ async function AdminContent({ searchParams }: Pick<AdminPageProps, "searchParams
     );
   }
 
-  const [{ data, error }, approvedPoints] = await Promise.all([
+  const [{ data, error }, publishedPoints] = await Promise.all([
     client.from("map_hidden_points").select("point_id").order("point_id"),
-    readApprovedPoints(),
+    readPublishedPoints(),
   ]);
   const hiddenPointNames = new Map(pointNames);
-  for (const { id, name } of approvedPoints ?? []) hiddenPointNames.set(id, name);
+  for (const { id, name } of publishedPoints ?? []) hiddenPointNames.set(id, name);
   return (
     <>
       <div className={styles.toolbar}>

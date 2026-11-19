@@ -16,7 +16,7 @@ import {
   type MarkerClusterGroup,
   type Point,
 } from "leaflet";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MapContainer, Marker, Popup, Rectangle, useMap } from "react-leaflet";
 import ClusterGroup from "react-leaflet-cluster";
 import { mapViewOnlyParam, maxZoom, readMapLocation, worldHalfSize } from "@/lib/map-location";
@@ -290,11 +290,11 @@ function PointMarkers({ points, canManagePoints, selectedCategories, selection, 
   ) : visibleMarkers;
 }
 
-export default function LeafletGameMap({ hiddenPointIds, approvedPoints, canManagePoints }: GameMapProps) {
+export default function LeafletGameMap({ hiddenPointIds, publishedPoints, canManagePoints }: GameMapProps) {
   const points = useMemo(() => {
     const hidden = new Set(hiddenPointIds);
-    return [...mapPoints, ...approvedPoints].filter(({ id }) => !hidden.has(id));
-  }, [approvedPoints, hiddenPointIds]);
+    return [...mapPoints, ...publishedPoints].filter(({ id }) => !hidden.has(id));
+  }, [publishedPoints, hiddenPointIds]);
   const [{ sharedLocation, showLocationMarker }] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     return {
@@ -330,10 +330,10 @@ export default function LeafletGameMap({ hiddenPointIds, approvedPoints, canMana
     }
   }
 
-  function selectPoint(point: MapPoint) {
+  const selectPoint = useCallback((point: MapPoint) => {
     setSelectedCategories((previous) => previous[point.category] ? previous : { ...previous, [point.category]: true });
     setSelection({ point });
-  }
+  }, []);
 
   return (
     <>
@@ -370,7 +370,11 @@ export default function LeafletGameMap({ hiddenPointIds, approvedPoints, canMana
           stroke={false}
           fillOpacity={1}
         />
-        <MapLocationMenu sharedLocation={!selection && showLocationMarker ? sharedLocation : null} />
+        <MapLocationMenu
+          sharedLocation={!selection && showLocationMarker ? sharedLocation : null}
+          canManagePoints={canManagePoints}
+          onPointAdded={selectPoint}
+        />
         <PointMarkers
           points={points}
           canManagePoints={canManagePoints}

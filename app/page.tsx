@@ -1,18 +1,18 @@
 import Image from "next/image";
 import { Suspense } from "react";
 import GameMap from "@/components/map/GameMap";
-import { getMapAdminClient, readApprovedPoints, readHiddenPointIds } from "@/lib/supabase/map-server";
+import { getMapAdminClient, readPublishedPoints, readHiddenPointIds } from "@/lib/supabase/map-server";
 
 async function MapContent() {
-  const [hiddenPointIds, approvedPoints, admin] = await Promise.all([
-    readHiddenPointIds(), readApprovedPoints(), getMapAdminClient(),
+  const [hiddenPointIds, publishedPoints, admin] = await Promise.all([
+    readHiddenPointIds(), readPublishedPoints(), getMapAdminClient(),
   ]);
 
-  if (!hiddenPointIds || !approvedPoints) {
+  if (!hiddenPointIds || !publishedPoints) {
     return <div className="map-loading" role="alert">Mapu se nepodařilo načíst. Zkus obnovit stránku.</div>;
   }
 
-  return <GameMap hiddenPointIds={hiddenPointIds} approvedPoints={approvedPoints} canManagePoints={Boolean(admin)} />;
+  return <GameMap hiddenPointIds={hiddenPointIds} publishedPoints={publishedPoints} canManagePoints={Boolean(admin)} />;
 }
 
 export default function Home() {
@@ -22,8 +22,8 @@ export default function Home() {
         <Image
           src="/logo/gta6-cz-map-logo.svg"
           alt="GTA VI Interaktivní mapa"
-          width={132}
-          height={33}
+          width={142}
+          height={37}
           loading="eager"
           unoptimized
         />

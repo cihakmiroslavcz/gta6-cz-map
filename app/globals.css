@@ -424,7 +424,8 @@ body {
   border-radius: 8px;
 }
 
-.game-map .point-card-detail {
+.game-map .point-card-detail,
+.mobile-point-editor .point-card-detail {
   overflow: auto;
   overscroll-behavior: contain;
   color-scheme: dark;
@@ -504,7 +505,7 @@ body {
   background: #193e5aee;
 }
 
-.game-map .map-location-popup .leaflet-popup-content-wrapper {
+.game-map .map-location-popup:has(.map-location-actions) .leaflet-popup-content-wrapper {
   border-radius: var(--space-4);
 }
 
@@ -512,7 +513,7 @@ body {
   fill: var(--map-switch-on);
 }
 
-.game-map .map-location-popup .leaflet-popup-content {
+.game-map .map-location-popup:has(.map-location-actions) .leaflet-popup-content {
   width: min(232px, calc(100vw - 44px));
   max-width: min(232px, calc(100vw - 44px));
 }
@@ -576,6 +577,10 @@ body {
   line-height: 36px;
 }
 
+.game-map .map-location-popup:has(.map-location-actions) .leaflet-popup-close-button {
+  display: none;
+}
+
 .game-map a.leaflet-popup-close-button span {
   display: none;
 }
@@ -626,6 +631,117 @@ body {
 
 .point-share button:hover {
   background: var(--point-action-hover);
+}
+
+.point-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 0;
+}
+
+.point-editor-fields {
+  padding: 2px;
+}
+
+.point-editor .point-editor-error {
+  margin: 0;
+}
+
+.point-editor label {
+  display: grid;
+  gap: var(--space-1);
+  font-weight: 650;
+}
+
+.point-editor :is(input, select, textarea) {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--space-2);
+  background: #08243a80;
+  color: var(--glass-ink);
+  font: var(--map-input-size) / var(--map-input-line) var(--font-ui);
+}
+
+.point-editor select option {
+  background: #193e5a;
+}
+
+.point-editor textarea {
+  resize: vertical;
+}
+
+.point-editor :is(input, select, textarea):focus-visible {
+  outline: 2px solid #b9ebff;
+  outline-offset: -2px;
+}
+
+.point-editor button:disabled {
+  opacity: 0.65;
+  cursor: progress;
+}
+
+.mobile-point-editor {
+  position: fixed;
+  inset: var(--editor-top, 0px) auto auto var(--editor-left, 0px);
+  box-sizing: border-box;
+  width: var(--editor-width, 100dvw);
+  height: var(--editor-height, 100dvh);
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: var(--space-3);
+  border: 0;
+  background: transparent;
+  color: var(--glass-ink);
+}
+
+.mobile-point-editor[open] {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  place-items: center;
+}
+
+.mobile-point-editor::backdrop {
+  background: #05182b80;
+}
+
+.mobile-point-editor .point-card {
+  width: min(100%, 360px);
+  max-height: 100%;
+  border: 1px solid var(--glass-edge);
+  border-radius: 20px;
+  background: var(--glass-background);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(16px) saturate(150%);
+}
+
+.mobile-point-editor .point-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.point-editor-close {
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  height: 44px;
+  margin: -8px -8px -8px 0;
+  border: 0;
+  border-radius: var(--space-2);
+  background: transparent;
+  color: inherit;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.mobile-point-editor .point-editor :is(input, select, textarea) {
+  min-height: 44px;
+  font-size: max(16px, var(--map-input-size));
 }
 
 .point-share button:focus-visible {

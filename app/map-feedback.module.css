@@ -54,11 +54,13 @@
 }
 
 .form,
+.fields,
 .field {
   display: grid;
 }
 
-.form {
+.form,
+.fields {
   gap: var(--space-4);
 }
 

@@ -21,6 +21,9 @@ const materialSymbols = localFont({
 export const metadata: Metadata = {
   title: "GTA VI Interaktivní mapa",
   description: "Česká interaktivní komunitní mapa Grand Theft Auto VI.",
+  icons: {
+    icon: { url: "/favicon/gta6-cz-map-favicon.svg", type: "image/svg+xml", sizes: "any" },
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

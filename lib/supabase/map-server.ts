@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { isPublishedPointCategory, isPublishedPointType, type MapPoint } from "@/components/map/map-points";
-import { isSuggestionId, suggestionPointId } from "@/lib/map-point-id";
+import { isPublishedPointId, isUuid } from "@/lib/map-point-id";
 import { sessionCookieOptions, supabaseConfig } from "./config";
 
 export async function createSessionClient() {
@@ -61,46 +61,62 @@ export async function readHiddenPointIds() {
   return data.map(({ point_id }) => String(point_id));
 }
 
-export async function readApprovedPoints(suggestionId?: string): Promise<MapPoint[] | null> {
-  const client = createPublicClient();
-  if (!client) return [];
-
+async function readPointTable(client: SupabaseClient, prefix: "A" | "S", id?: string): Promise<MapPoint[] | null> {
+  const table = prefix === "A" ? "map_admin_points" : "map_suggestion_reviews";
+  const idColumn = prefix === "A" ? "id" : "suggestion_id";
+  const idSelection = prefix === "A" ? "id" : "id:suggestion_id";
   const points: MapPoint[] = [];
   const pageSize = 1000;
   let after: string | undefined;
 
   do {
-    const query = client.from("map_suggestion_reviews")
-      .select("suggestion_id,name,description,category,type,x,y")
-      .eq("decision", "approved")
-      .order("suggestion_id")
+    const query = client.from(table)
+      .select(`${idSelection},name,description,category,type,x,y`)
+      .order(idColumn)
       .limit(pageSize);
-    if (suggestionId) query.eq("suggestion_id", suggestionId);
-    if (after) query.gt("suggestion_id", after);
+    if (prefix === "S") query.eq("decision", "approved");
+    if (id) query.eq(idColumn, id);
+    if (after) query.gt(idColumn, after);
     const { data, error } = await query;
     if (error) {
-      // Keep serving the existing map until the review migration is applied.
+      // Keep serving the existing map until the corresponding migration is applied.
       if (error.code === "PGRST205" || error.code === "42P01") return [];
-      console.error("Could not read map_suggestion_reviews", error.code);
+      console.error(`Could not read ${table}`, error.code);
       return null;
     }
 
     for (const row of data) {
-      if (!isSuggestionId(row.suggestion_id) || !isPublishedPointCategory(row.category) || !isPublishedPointType(row.type)) {
+      const rowId = row.id;
+      if (!isUuid(rowId) || !isPublishedPointCategory(row.category) || !isPublishedPointType(row.type)) {
         continue;
       }
       points.push({
-        id: suggestionPointId(row.suggestion_id),
+        id: `${prefix}${rowId}`,
         name: row.name,
-        description: row.description,
+        description: row.description ?? undefined,
         category: row.category,
         type: row.type,
         x: Number(row.x),
         y: Number(row.y),
       });
     }
-    after = data.length === pageSize ? data.at(-1)?.suggestion_id : undefined;
+    after = data.length === pageSize ? data.at(-1)?.id : undefined;
   } while (after);
 
   return points;
+}
+
+export async function readPublishedPoints(pointId?: string): Promise<MapPoint[] | null> {
+  const client = createPublicClient();
+  if (!client) return [];
+  if (pointId !== undefined) {
+    if (!isPublishedPointId(pointId)) return [];
+    return readPointTable(client, pointId.startsWith("A") ? "A" : "S", pointId.slice(1));
+  }
+
+  const [approvedPoints, adminPoints] = await Promise.all([
+    readPointTable(client, "S"),
+    readPointTable(client, "A"),
+  ]);
+  return approvedPoints && adminPoints ? [...approvedPoints, ...adminPoints] : null;
 }
