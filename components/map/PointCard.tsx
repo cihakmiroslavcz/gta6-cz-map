@@ -17,7 +17,11 @@ function HidePointForm({ pointId }: { pointId: string }) {
   );
 }
 
-export default function PointCard({ point, canManagePoint = false }: { point: MapPoint; canManagePoint?: boolean }) {
+export default function PointCard({ point, canManagePoint = false, onEdit }: {
+  point: MapPoint;
+  canManagePoint?: boolean;
+  onEdit?: (point: MapPoint) => void;
+}) {
   const [shareStatus, setShareStatus] = useState<
     { copied: true } | { copied: false; link: string } | null
   >(null);
@@ -77,7 +81,12 @@ export default function PointCard({ point, canManagePoint = false }: { point: Ma
           </label>
         )}
       </footer>
-      {canManagePoint && <HidePointForm pointId={point.id} />}
+      {canManagePoint && (
+        <div className="point-admin-actions">
+          {onEdit && <button type="button" onClick={() => onEdit(point)}>Upravit bod</button>}
+          <HidePointForm pointId={point.id} />
+        </div>
+      )}
     </article>
   );
 }

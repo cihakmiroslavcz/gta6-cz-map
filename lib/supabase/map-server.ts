@@ -1,8 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
-import { isPublishedPointCategory, isPublishedPointType, type MapPoint } from "@/components/map/map-points";
-import { isPublishedPointId, isUuid } from "@/lib/map-point-id";
+import { isPublishedPointCategory, isPublishedPointType, mapPoints, type MapPoint } from "@/components/map/map-points";
+import { isMapPointId, isPublishedPointId, isUuid } from "@/lib/map-point-id";
 import { sessionCookieOptions, supabaseConfig } from "./config";
 
 export async function createSessionClient() {
@@ -122,4 +122,45 @@ export async function readPublishedPoints(pointId?: string): Promise<MapPoint[] 
     readPointTable(client, "A"),
   ]);
   return approvedPoints && adminPoints ? [...approvedPoints, ...adminPoints] : null;
+}
+
+async function readPointEdits(pointId?: string) {
+  const edits = new Map<string, Pick<MapPoint, "name" | "description" | "category" | "type">>();
+  const client = createPublicClient();
+  if (!client) return edits;
+
+  const pageSize = 1000;
+  let after: string | undefined;
+  do {
+    const query = client.from("map_point_edits").select("point_id,name,description,category,type").order("point_id").limit(pageSize);
+    if (pointId) query.eq("point_id", pointId);
+    if (after) query.gt("point_id", after);
+    const { data, error } = await query;
+    if (error) {
+      if (error.code === "PGRST205" || error.code === "42P01") return edits;
+      console.error("Could not read map_point_edits", error.code);
+      return null;
+    }
+    for (const row of data) {
+      if (!isPublishedPointCategory(row.category) || !isPublishedPointType(row.type)) continue;
+      edits.set(row.point_id, { name: row.name, description: row.description ?? undefined, category: row.category, type: row.type });
+    }
+    after = data.length === pageSize ? data.at(-1)?.point_id : undefined;
+  } while (after);
+  return edits;
+}
+
+export async function readMapPoints(pointId?: string): Promise<MapPoint[] | null> {
+  if (pointId !== undefined && !isMapPointId(pointId)) return [];
+  const [published, edits] = await Promise.all([
+    pointId?.startsWith("L") ? [] : readPublishedPoints(pointId),
+    readPointEdits(pointId),
+  ]);
+  if (!published || !edits) return null;
+
+  const points = pointId ? [...mapPoints.filter(({ id }) => id === pointId), ...published] : [...mapPoints, ...published];
+  return points.map((point) => {
+    const edit = edits.get(point.id);
+    return edit ? { ...point, ...edit } : point;
+  });
 }

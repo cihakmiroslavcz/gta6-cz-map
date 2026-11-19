@@ -268,7 +268,7 @@ const curatedPoints: MapPoint[] = [
   },
   {
     id: "L346",
-    name: "Jezero západně od Vice City",
+    name: "Three Toe Lake",
     description: "Jezero na západním okraji oblasti Vice City.",
     category: "nature",
     type: "lake",
@@ -358,12 +358,11 @@ const curatedPoints: MapPoint[] = [
   },
   {
     id: "L2245",
-    name: "Čerpací stanice v Buckskinu",
-    description: "Čerpací stanice v oblasti Buckskin.",
+    name: "Čerpací stanice v okrese Kelly",
     category: "city",
     type: "gasStation",
-    x: -3956.9,
-    y: 883.7,
+    x: -5311.2,
+    y: 1093,
   },
 ];
 
@@ -440,6 +439,17 @@ const namedTypes: ReadonlyArray<[MapPoint["type"], PointCategory, RegExp]> = [
   ["church", "city", /\bchurch$/],
 ];
 
+// Some named points do not yet have a GTADB tag that describes their type.
+const pointClassifications = new Map<string, readonly [MapPoint["type"], PointCategory]>([
+  ["L1563", ["attraction", "landmark"]], // Dawson Dam
+  ["L2489", ["naturalSite", "nature"]], // Kalaga Reservoir
+  ["L2518", ["attraction", "landmark"]], // Infinity Tower
+  ["L3240", ["attraction", "landmark"]], // August Hill Farm
+  ["L3658", ["cinema", "landmark"]], // Gellhorn Drive-In Theatre
+  ["L3744", ["attraction", "landmark"]], // Effete
+  ["L3749", ["naturalSite", "nature"]], // Sharktooth Island
+]);
+
 // Translate whole generic labels only. A label containing a proper name keeps its original wording.
 const genericPointNames = new Map([
   ["airfield", "Letiště"],
@@ -505,7 +515,8 @@ function importPoint({ id, name, x, y, location, tags = [] }: typeof gtadbPoints
   const translatedName = genericPointNames.get(genericName);
   const [type, category] = tags.includes("#bus")
     ? (["busStop", "city"] as const)
-    : namedTypes.find(([, , pattern]) => pattern.test(genericName))
+    : pointClassifications.get(id)
+      ?? namedTypes.find(([, , pattern]) => pattern.test(genericName))
       ?? tagTypes.find(([, , keys]) => keys.some((key) => tags.includes(key)))
       ?? ["unknown", "uncategorized"];
 

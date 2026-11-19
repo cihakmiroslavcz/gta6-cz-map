@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { isPublishedPointCategory, isPublishedPointType, mapPoints, pointLinkParam, type MapPoint } from "@/components/map/map-points";
 import { readMapLocation } from "@/lib/map-location";
 import { isMapPointId, isSuggestionId } from "@/lib/map-point-id";
-import { createSessionClient, getMapAdminClient, isMapAdmin, readPublishedPoints } from "@/lib/supabase/map-server";
+import { createSessionClient, getMapAdminClient, isMapAdmin, readMapPoints, readPublishedPoints } from "@/lib/supabase/map-server";
 
 export async function signIn(formData: FormData) {
   const client = await createSessionClient();
@@ -37,15 +37,9 @@ function revalidateMap() {
   revalidatePath("/nahlasit-chybu");
 }
 
-type AddPointResult = { point: MapPoint } | { error: string } | null;
+type SavePointResult = { point: MapPoint } | { error: string } | null;
 
-export async function addPoint(_previous: AddPointResult, formData: FormData): Promise<AddPointResult> {
-  const client = await getMapAdminClient();
-  if (!client) return { error: "Pro přidání bodu se znovu přihlas jako správce." };
-
-  const location = readMapLocation({ x: formData.get("x"), y: formData.get("y"), z: formData.get("z") });
-  if (!location) return { error: "Vyber místo znovu přímo na mapě." };
-
+function readPointFields(formData: FormData) {
   const rawName = formData.get("name");
   const rawDescription = formData.get("description");
   const name = typeof rawName === "string" ? rawName.trim() : "";
@@ -54,11 +48,23 @@ export async function addPoint(_previous: AddPointResult, formData: FormData): P
   const type = formData.get("type");
   if (!name || name.length > 120 || description.length > 3000 ||
     !isPublishedPointCategory(category) || !isPublishedPointType(type)) {
-    return { error: "Zkontroluj název, popis, kategorii a typ bodu." };
+    return null;
   }
+  return { name, description: description || null, category, type };
+}
+
+export async function addPoint(_previous: SavePointResult, formData: FormData): Promise<SavePointResult> {
+  const client = await getMapAdminClient();
+  if (!client) return { error: "Pro přidání bodu se znovu přihlas jako správce." };
+
+  const location = readMapLocation({ x: formData.get("x"), y: formData.get("y"), z: formData.get("z") });
+  if (!location) return { error: "Vyber místo znovu přímo na mapě." };
+
+  const fields = readPointFields(formData);
+  if (!fields) return { error: "Zkontroluj název, popis, kategorii a typ bodu." };
 
   const { data, error } = await client.from("map_admin_points")
-    .insert({ name, description: description || null, category, type, x: location.x, y: location.y })
+    .insert({ ...fields, x: location.x, y: location.y })
     .select("id,x,y")
     .single();
   if (error) {
@@ -70,7 +76,34 @@ export async function addPoint(_previous: AddPointResult, formData: FormData): P
   }
 
   revalidateMap();
-  return { point: { id: `A${data.id}`, name, description, category, type, x: Number(data.x), y: Number(data.y) } };
+  return { point: { ...fields, id: `A${data.id}`, description: fields.description ?? undefined, x: Number(data.x), y: Number(data.y) } };
+}
+
+export async function editPoint(_previous: SavePointResult, formData: FormData): Promise<SavePointResult> {
+  const client = await getMapAdminClient();
+  if (!client) return { error: "Pro úpravu bodu se znovu přihlas jako správce." };
+
+  const pointId = formData.get(pointLinkParam);
+  if (!isMapPointId(pointId)) return { error: "Bod se nepodařilo najít." };
+  const fields = readPointFields(formData);
+  if (!fields) return { error: "Zkontroluj název, popis, kategorii a typ bodu." };
+
+  const points = await readMapPoints(pointId);
+  if (!points) return { error: "Bod se nepodařilo načíst. Zkus to znovu." };
+  const [point] = points;
+  if (!point) return { error: "Bod se nepodařilo najít." };
+
+  const { error } = await client.from("map_point_edits").upsert({ point_id: pointId, ...fields });
+  if (error) {
+    console.error("Could not save map_point_edits", error.code);
+    if (error.code === "PGRST205" || error.code === "42P01") {
+      return { error: "Úpravy bodů vyžadují migraci databáze map_point_edits." };
+    }
+    return { error: "Úpravu se nepodařilo uložit. Zkus to znovu." };
+  }
+
+  revalidateMap();
+  return { point: { ...point, ...fields, description: fields.description ?? undefined } };
 }
 
 export async function hidePoint(_previous: string | null, formData: FormData): Promise<string | null> {

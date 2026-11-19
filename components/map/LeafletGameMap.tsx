@@ -24,9 +24,11 @@ import { mapViewOnlyParam, maxZoom, readMapLocation, worldHalfSize } from "@/lib
 import type { GameMapProps } from "./GameMap";
 import MapLocationMenu from "./MapLocationMenu";
 import MapTools from "./MapTools";
+import MobileMapDialog from "./MobileMapDialog";
 import PointCard from "./PointCard";
+import PointEditorForm from "./PointEditorForm";
 import { getMapFilterType, updateHiddenFilterTypes, type MapFilterType } from "./map-filter-groups";
-import { mapPoints, pointLinkParam, pointTypes, type MapPoint } from "./map-points";
+import { pointLinkParam, pointTypes, type MapPoint } from "./map-points";
 
 const tileRoot = "/maps/tiles/6/yanis,18";
 const tileSize = 256;
@@ -154,28 +156,31 @@ function MapCoordinates() {
   );
 }
 
+const pointIcons = new Map<string, ReturnType<typeof divIcon>>();
+
 function pointIcon({ category, type }: MapPoint) {
-  if (type === "treasure") {
-    return divIcon({
+  const key = `${category}:${type}`;
+  const cached = pointIcons.get(key);
+  if (cached) return cached;
+
+  const icon = type === "treasure"
+    ? divIcon({
       className: "map-treasure",
       iconSize: [32, 32],
       iconAnchor: [16, 16],
       popupAnchor: [0, -16],
       tooltipAnchor: [0, -12],
+    }) : divIcon({
+      className: `map-pin map-pin-${category}`,
+      html: `<span class="material-icon" aria-hidden="true">${pointTypes[type].icon}</span>`,
+      iconSize: [36, 36],
+      iconAnchor: [18, 36],
+      popupAnchor: [0, -34],
+      tooltipAnchor: [0, -38],
     });
-  }
-
-  return divIcon({
-    className: `map-pin map-pin-${category}`,
-    html: `<span class="material-icon" aria-hidden="true">${pointTypes[type].icon}</span>`,
-    iconSize: [36, 36],
-    iconAnchor: [18, 36],
-    popupAnchor: [0, -34],
-    tooltipAnchor: [0, -38],
-  });
+  pointIcons.set(key, icon);
+  return icon;
 }
-
-const pointIcons = new Map(mapPoints.map((point) => [point.id, pointIcon(point)]));
 
 const pointMarkerEvents: LeafletEventHandlerFnMap = {
   add({ target }: { target: LeafletMarker }) {
@@ -253,9 +258,10 @@ type PointMarkersProps = {
   canManagePoints: boolean;
   selection: { point: MapPoint } | null;
   clustering: boolean;
+  onPointEdit: (point: MapPoint) => void;
 };
 
-function PointMarkers({ points, canManagePoints, selection, clustering }: PointMarkersProps) {
+function PointMarkers({ points, canManagePoints, selection, clustering, onPointEdit }: PointMarkersProps) {
   const map = useMap();
   const markers = useRef(new Map<string, LeafletMarker>());
   const group = useRef<MarkerClusterGroup>(null);
@@ -288,23 +294,26 @@ function PointMarkers({ points, canManagePoints, selection, clustering }: PointM
     <Marker
       key={point.id}
       ref={(marker) => {
-        if (marker) markers.current.set(point.id, marker);
-        else markers.current.delete(point.id);
+        if (marker) {
+          marker.options.alt = point.name;
+          marker.getElement()?.setAttribute("aria-label", point.name);
+          markers.current.set(point.id, marker);
+        } else markers.current.delete(point.id);
       }}
       position={[point.y, point.x]}
-      icon={pointIcons.get(point.id) ?? pointIcon(point)}
+      icon={pointIcon(point)}
       alt={point.name}
       riseOnHover
       eventHandlers={pointMarkerEvents}
     >
       <Popup maxWidth={320} autoPanPaddingTopLeft={[16, 152]} autoPanPaddingBottomRight={[16, 136]}>
-        <PointCard point={point} canManagePoint={canManagePoints} />
+        <PointCard point={point} canManagePoint={canManagePoints} onEdit={onPointEdit} />
       </Popup>
       <Tooltip className="map-point-tooltip" direction="top" offset={[0, -5]} opacity={1}>
         <span>{point.name}</span>
       </Tooltip>
     </Marker>
-  )), [points, canManagePoints]);
+  )), [points, canManagePoints, onPointEdit]);
 
   return clustering ? (
     <ClusterGroup
@@ -321,11 +330,12 @@ function PointMarkers({ points, canManagePoints, selection, clustering }: PointM
   ) : visibleMarkers;
 }
 
-export default function LeafletGameMap({ hiddenPointIds, publishedPoints, canManagePoints }: GameMapProps) {
+export default function LeafletGameMap({ hiddenPointIds, points: allPoints, canManagePoints }: GameMapProps) {
   const points = useMemo(() => {
     const hidden = new Set(hiddenPointIds);
-    return [...mapPoints, ...publishedPoints].filter(({ id }) => !hidden.has(id));
-  }, [publishedPoints, hiddenPointIds]);
+    return allPoints.filter(({ id }) => !hidden.has(id));
+  }, [allPoints, hiddenPointIds]);
+  const [editingPoint, setEditingPoint] = useState<MapPoint | null>(null);
   const [{ sharedLocation, showLocationMarker }] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     return {
@@ -413,8 +423,21 @@ export default function LeafletGameMap({ hiddenPointIds, publishedPoints, canMan
           canManagePoints={canManagePoints}
           selection={selection}
           clustering={clustering}
+          onPointEdit={setEditingPoint}
         />
       </MapContainer>
+      {canManagePoints && editingPoint && (
+        <MobileMapDialog title="Upravit bod" onClose={() => setEditingPoint(null)}>
+          <PointEditorForm
+            point={editingPoint}
+            inDialog
+            onSaved={(point) => {
+              setEditingPoint(null);
+              selectPoint(point);
+            }}
+          />
+        </MobileMapDialog>
+      )}
     </>
   );
 }

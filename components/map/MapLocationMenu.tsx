@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent }
 import { CircleMarker, Popup, useMap, useMapEvents } from "react-leaflet";
 import SuggestionForm from "@/app/navrhnout-misto/SuggestionForm";
 import { isValidMapLocation, mapLocationParams, type MapLocation } from "@/lib/map-location";
-import AddPointForm from "./AddPointForm";
+import PointEditorForm from "./PointEditorForm";
 import MobileMapDialog from "./MobileMapDialog";
 import type { MapPoint } from "./map-points";
 
@@ -72,7 +72,7 @@ function LocationActions({ location, canManagePoints, onPointAdded, onOpenMobile
     >
       {editing && canManagePoints ? (
         <div onKeyDown={closeOnEscape}>
-          <AddPointForm location={location} onAdded={handlePointAdded} />
+          <PointEditorForm location={location} onSaved={handlePointAdded} />
         </div>
       ) : (
         <div className="map-location-actions" role="group" aria-label="Akce pro vybrané místo" onKeyDown={closeOnEscape}>
@@ -206,10 +206,10 @@ export default function MapLocationMenu({ sharedLocation, canManagePoints, onPoi
           onClose={() => setMobileDialog(null)}
         >
           {activeDialog.kind === "add" ? (
-            <AddPointForm
+            <PointEditorForm
               location={activeDialog.location}
               inDialog
-              onAdded={(point) => {
+              onSaved={(point) => {
                 setMobileDialog(null);
                 onPointAdded(point);
               }}
