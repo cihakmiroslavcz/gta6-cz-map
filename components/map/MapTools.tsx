@@ -365,7 +365,10 @@ export default function MapTools({
               <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
               Původní postranní panel mapy je zakrytý.
             </p>
-            <p>Oficiální mapa Leonidy © Rockstar Games.</p>
+            <p>
+              Oficiální mapa Leonidy © Rockstar Games.{" "}
+              <a href="https://www.rockstargames.com/VI/media/artwork-wallpapers">Stáhnout mapu u Rockstar Games</a>.
+            </p>
             <p>
               Data bodů vytvořili <a href="https://github.com/rolux/gtadb.org/blob/main/map/data/6/landmarks.json">GTADB
               a přispěvatelé</a> pod licencí{" "}
