@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "width": 2805,
+  "height": 3840,
+  "tileSize": 768,
+  "variants": [
+    1,
+    2,
+    3
+  ]
+}

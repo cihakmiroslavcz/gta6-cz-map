@@ -13,11 +13,35 @@ Mapu otevři na [localhost:3000](http://localhost:3000).
 
 ## Mapové podklady
 
-Aplikace používá sadu `yanis,18` z GTADB. Ve složce `public/maps/tiles/6/yanis,18/` mají být adresáře `0` až `5` s JPEG dlaždicemi o rozměrech 256 × 256 px. Příklad cesty je `public/maps/tiles/6/yanis,18/0/0,0,0.jpg`.
+**Nastavení → Mapový podklad** nabízí výchozí **Neoficiální mapu** (Yanis V18) a **Oficiální mapu** (plakát Leonidy od Rockstar Games). Výběr se ukládá do prohlížeče. Obě vrstvy používají stejnou instanci Leafletu, herní souřadnice i zoom 0–5.
+
+### Neoficiální mapa
+
+Sada `yanis,18` z GTADB používá adresáře `0` až `5` s JPEG dlaždicemi o rozměrech 256 × 256 px ve složce `public/maps/tiles/6/yanis,18/`. Příklad cesty je `public/maps/tiles/6/yanis,18/0/0,0,0.jpg`.
 
 Git místní dlaždice ignoruje. Pokud dlaždice v uvedené cestě chybí, Next.js ji načte z [hostingu GTADB](https://map.gtadb.org/). Produkční mapa tak funguje i při nasazení z GitHubu bez dlaždic v repozitáři a v takovém případě závisí na dostupnosti GTADB.
 
 Podklady Yanis V18 poskytuje gtadb.org pod licencí [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Aplikace při vykreslení zakrývá původní postranní panel. [Kredity autorů](public/maps/yanis-v18-kredity.jpg) jsou dostupné v Nastavení → Kredity.
+
+### Oficiální mapa
+
+Zdrojový plakát má 2805 × 3840 px a je uložený jako `public/maps/leonida/Leonida_Map_Poster.jpg`. Skript vyrobí WebP náhled, společné dlaždice pro menší přiblížení a dlaždice pro vybraná rozlišení do `public/maps/leonida/generated/`. Spusť ho z kořene projektu s Pythonem a Pillow.
+
+```sh
+python -m pip install Pillow
+python scripts/generate-leonida.py
+python scripts/generate-leonida.py --upscale 2 --upscale 3
+python scripts/generate-leonida.py --upscale 2 --sharpen
+```
+
+Každý běh připraví původní rozlišení a případné varianty uvedené v příkazu. Zvětšení používá Lanczos a volitelná jemná maska neostrosti se použije na zvětšené varianty před rozřezáním na dlaždice. Zdrojový soubor zůstane beze změny. Pokud máš kvalitnější originál, použij ho s `--source cesta/k/souboru.jpg`. Při stejném ořezu a poměru stran se jeho rozměry převezmou automaticky. Při odlišném ořezu uprav zarovnání podle následujícího postupu.
+
+### Ověření pinů a kalibrace
+
+1. V nastavení zapni **Překrýt podklady** a nastav krytí přibližně na 50 %. Piny, filtry i pozice kamery se při přepínání podkladu nebo změně krytí zachovají. Přepínání samostatných podkladů překryv vypne.
+2. Porovnej pobřeží, křižovatky a dráhy letišť v několika vzdálených oblastech. Potom zkus konkrétní piny a zkontroluj, zda jejich špička ukazuje na odpovídající místo. Pro srovnání variant 1×, 2× a 3× použij volbu **Rozlišení oficiální mapy** při zoomu 3 nebo vyšším. Při menším přiblížení mohou varianty sdílet stejné dlaždice.
+3. Výchozí zarovnání podle severozápadního mysu a jihozápadního letiště je přibližné. Pro zpřesnění si vyber dva vzdálené body viditelné na obou mapách a třetí nezávislý bod pro kontrolu. Na plakátu změř jejich obrazové souřadnice v pixelech od levého horního rohu. Na komunitní mapě odečti herní souřadnice z ukazatele na desktopu a převeď je na pixely při zoomu 0 vzorci `u = 512 + X / 32` a `v = 512 - Y / 32`.
+4. Vypočítej jednotné měřítko `s` jako poměr vzdálenosti mezi dvěma body na komunitní mapě a vzdálenosti odpovídajících bodů na plakátu. V [map-basemaps.ts](components/map/map-basemaps.ts) nastav `leonidaAlignment.width` na `s × šířka plakátu`. Pro první referenční bod vypočítej `left = u - s × xPlakátu` a `top = v - s × yPlakátu`. Výška se dopočítá z poměru stran. Úprava platí pro všechna rozlišení a projeví se bez nového generování dlaždic. Pokud se odchylka na třetím bodě liší od odchylek u referencí, jednotné měřítko a posun nemusí pokrýt místní rozdíly mezi mapami.
 
 ## Body zájmu a legenda
 
