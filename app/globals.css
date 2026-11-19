@@ -1190,6 +1190,55 @@ a.point-report:hover {
   box-shadow: 0 0 0 1px #fff0c7;
 }
 
+.game-map .map-pin::before,
+.game-map .map-pin .material-icon {
+  scale: var(--marker-highlight-scale, 1);
+  translate: 0 var(--marker-highlight-lift, 0px);
+}
+
+.game-map .map-treasure::after {
+  scale: var(--marker-highlight-scale, 1);
+}
+
+.game-map :is(.map-pin, .map-treasure):focus-visible {
+  --marker-highlight-scale: 1.14;
+  --marker-highlight-lift: -3px;
+}
+
+@media (any-hover: hover) {
+  .game-map :is(.map-pin, .map-treasure):hover {
+    --marker-highlight-scale: 1.14;
+    --marker-highlight-lift: -3px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .game-map .map-pin::before,
+  .game-map .map-pin .material-icon,
+  .game-map .map-treasure::after {
+    transition: scale 140ms ease-out, translate 140ms ease-out;
+  }
+}
+
+.game-map .map-point-tooltip {
+  width: max-content;
+  max-width: min(248px, calc(100vw - 32px));
+  padding: 6px 10px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 10px;
+  background: #16273c;
+  box-shadow: 0 4px 14px #071b3460;
+  color: var(--glass-ink);
+  font: 700 var(--map-control-size) / var(--map-control-line) var(--font-ui);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+.game-map .map-point-tooltip::before {
+  display: none;
+}
+
 @media (max-width: 1024px) {
   .map-screen {
     --hud-inset: var(--space-3);

@@ -10,6 +10,7 @@ import {
   point,
   type Coords,
   type LatLngBoundsExpression,
+  type LeafletEventHandlerFnMap,
   type LeafletMouseEvent,
   type Marker as LeafletMarker,
   type MarkerCluster,
@@ -17,7 +18,7 @@ import {
   type Point,
 } from "leaflet";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { MapContainer, Marker, Popup, Rectangle, useMap } from "react-leaflet";
+import { MapContainer, Marker, Popup, Rectangle, Tooltip, useMap } from "react-leaflet";
 import ClusterGroup from "react-leaflet-cluster";
 import { mapViewOnlyParam, maxZoom, readMapLocation, worldHalfSize } from "@/lib/map-location";
 import type { GameMapProps } from "./GameMap";
@@ -160,6 +161,7 @@ function pointIcon({ category, type }: MapPoint) {
       iconSize: [32, 32],
       iconAnchor: [16, 16],
       popupAnchor: [0, -16],
+      tooltipAnchor: [0, -12],
     });
   }
 
@@ -169,10 +171,23 @@ function pointIcon({ category, type }: MapPoint) {
     iconSize: [36, 36],
     iconAnchor: [18, 36],
     popupAnchor: [0, -34],
+    tooltipAnchor: [0, -38],
   });
 }
 
 const pointIcons = new Map(mapPoints.map((point) => [point.id, pointIcon(point)]));
+
+const pointMarkerEvents: LeafletEventHandlerFnMap = {
+  add({ target }: { target: LeafletMarker }) {
+    target.getElement()?.setAttribute("aria-label", target.options.alt ?? "");
+  },
+  popupopen({ target }: { target: LeafletMarker }) {
+    target.closeTooltip();
+  },
+  tooltipopen({ target }: { target: LeafletMarker }) {
+    if (target.isPopupOpen()) target.closeTooltip();
+  },
+};
 
 const clusterSizes = [
   { minimum: 100, size: 52, className: "map-cluster-dense" },
@@ -278,11 +293,16 @@ function PointMarkers({ points, canManagePoints, selection, clustering }: PointM
       }}
       position={[point.y, point.x]}
       icon={pointIcons.get(point.id) ?? pointIcon(point)}
-      title={point.name}
+      alt={point.name}
+      riseOnHover
+      eventHandlers={pointMarkerEvents}
     >
       <Popup maxWidth={320} autoPanPaddingTopLeft={[16, 152]} autoPanPaddingBottomRight={[16, 136]}>
         <PointCard point={point} canManagePoint={canManagePoints} />
       </Popup>
+      <Tooltip className="map-point-tooltip" direction="top" offset={[0, -5]} opacity={1}>
+        <span>{point.name}</span>
+      </Tooltip>
     </Marker>
   )), [points, canManagePoints]);
 
