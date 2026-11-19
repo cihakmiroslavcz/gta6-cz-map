@@ -27,12 +27,14 @@
   --filter-accent: #9af3df;
   --map-switch-on: #ff42ac;
   --point-city-color: #9edbff;
+  --point-hairdresser-color: #ffa9d3;
   --point-nature-color: #b6eb91;
-  --point-landmark-color: #ffa9d3;
+  --point-landmark-color: #ffd298;
   --point-uncategorized-color: #d7c5ff;
   --point-city-fill: #096e9b;
+  --point-hairdresser-fill: #b32367;
   --point-nature-fill: #18784d;
-  --point-landmark-fill: #b32367;
+  --point-landmark-fill: #97511a;
   --point-uncategorized-fill: #6943ac;
   --map-cluster-small-fill: #485bc1;
   --map-cluster-medium-fill: #257746;
@@ -272,6 +274,11 @@ body {
   width: min(368px, calc(100vw - 2 * var(--hud-inset)));
 }
 
+.map-tools > .map-filter-panel {
+  max-height: clamp(112px, calc(100dvh - var(--hud-top) - 168px), 720px);
+  padding: var(--space-3);
+}
+
 .map-search {
   position: absolute;
   z-index: 1001;
@@ -484,6 +491,10 @@ body {
 
 .point-chip-category[data-category="nature"] {
   --chip-text: var(--point-nature-color);
+}
+
+.point-chip-category[data-category="hairdresser"] {
+  --chip-text: var(--point-hairdresser-color);
 }
 
 .point-chip-category[data-category="landmark"] {
@@ -790,6 +801,7 @@ a.point-report:hover {
   margin: 0;
   padding: 0;
   border: 0;
+  min-inline-size: 0;
 }
 
 .map-legend-section h2 {
@@ -813,6 +825,156 @@ a.point-report:hover {
 .map-filter-options {
   display: grid;
   gap: var(--space-2);
+}
+
+.map-filter-group {
+  --group-accent: var(--point-city-color);
+  border: 1px solid #a6d9f229;
+  border-radius: 14px;
+  background: #091d33a6;
+}
+
+.map-filter-group[data-group="places"] { --group-accent: #8cdfdb; }
+.map-filter-group[data-group="shops"] { --group-accent: #cdb9ff; }
+.map-filter-group[data-group="activities"] { --group-accent: #b6eb91; }
+.map-filter-group[data-group="collectibles"] { --group-accent: #f1cc72; }
+.map-filter-group[data-group="nightlife"] { --group-accent: #ffa9d3; }
+.map-filter-group[data-group="buildings"] { --group-accent: #d1dcec; }
+
+.map-filter-group-header {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+}
+
+.map-filter-expand,
+.map-filter-row {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 48px;
+  border-radius: 9px;
+  text-align: start;
+}
+
+.map-filter-expand {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-1) 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.map-filter-expand:hover,
+.map-filter-toggle:hover {
+  color: var(--group-accent);
+}
+
+.map-filter-expand:focus-visible,
+.map-filter-toggle:has(:focus-visible),
+.map-filter-row:has(:focus-visible) {
+  outline: 2px solid var(--group-accent);
+  outline-offset: -2px;
+}
+
+.map-filter-group-icon,
+.map-filter-row-icon {
+  display: grid;
+  flex: 0 0 26px;
+  place-items: center;
+  height: 26px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--group-accent) 17%, transparent);
+  color: var(--group-accent);
+}
+
+.map-filter-group-icon .material-icon,
+.map-filter-row-icon .material-icon {
+  font-size: 16px;
+}
+
+.map-filter-chevron {
+  flex: 0 0 6px;
+  height: 6px;
+  margin-inline: 2px;
+  border: solid var(--glass-muted);
+  border-width: 0 2px 2px 0;
+  rotate: -45deg;
+}
+
+.map-filter-expand[aria-expanded="true"] .map-filter-chevron {
+  rotate: 45deg;
+}
+
+.map-filter-toggle {
+  display: grid;
+  place-items: center;
+  min-width: 48px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.map-filter-rows {
+  margin: 0;
+  padding: 0 var(--space-2) var(--space-2);
+  list-style: none;
+}
+
+.map-filter-rows:not([hidden]) {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.map-filter-row {
+  min-height: 44px;
+  padding: var(--space-1) var(--space-2);
+  background: #afdbff12;
+  cursor: pointer;
+}
+
+.map-filter-row:hover {
+  background: #afdbff24;
+}
+
+.map-filter-row[data-type="hairSalon"] .map-filter-row-icon {
+  --group-accent: var(--point-hairdresser-color);
+}
+
+.map-filter-toggle .map-switch,
+.map-filter-row .map-switch {
+  flex-basis: 36px;
+  width: 36px;
+  height: 22px;
+  padding-inline: 3px;
+}
+
+.map-filter-toggle .map-switch {
+  margin: 0;
+}
+
+.map-filter-toggle .map-switch::before,
+.map-filter-row .map-switch::before {
+  width: 16px;
+  height: 16px;
+}
+
+.map-filter-toggle .map-switch:checked::before,
+.map-filter-row .map-switch:checked::before {
+  transform: translateX(14px);
+}
+
+.map-filter-toggle .map-switch:indeterminate {
+  background: color-mix(in srgb, var(--group-accent) 42%, #0e2238);
+}
+
+.map-filter-toggle .map-switch:indeterminate::before {
+  transform: translateX(7px);
 }
 
 .map-filter-option {
@@ -973,6 +1135,10 @@ a.point-report:hover {
   --pin-fill: var(--point-nature-fill);
 }
 
+.map-pin-hairdresser {
+  --pin-fill: var(--point-hairdresser-fill);
+}
+
 .map-pin-landmark {
   --pin-fill: var(--point-landmark-fill);
 }
@@ -994,6 +1160,34 @@ a.point-report:hover {
   background: var(--pin-fill);
   rotate: -45deg;
   box-shadow: 0 1px 5px #122438a6;
+}
+
+.map-treasure::before,
+.map-treasure::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  box-sizing: border-box;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.map-treasure::before {
+  width: 96px;
+  height: 96px;
+  border: 2px dashed #79551a;
+  background: #d4ad572b;
+  filter: drop-shadow(0 1px 0 #fff0c7b3);
+}
+
+.map-treasure::after {
+  width: 14px;
+  height: 14px;
+  border: 1px solid #513609;
+  background: #e0af44;
+  box-shadow: 0 0 0 1px #fff0c7;
 }
 
 @media (max-width: 1024px) {
@@ -1083,6 +1277,11 @@ a.point-report:hover {
 .point-nature {
   background: var(--point-nature-color);
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.point-hairdresser {
+  border-radius: 2px;
+  background: var(--point-hairdresser-color);
 }
 
 .point-landmark {

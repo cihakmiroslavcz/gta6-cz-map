@@ -24,7 +24,8 @@ import type { GameMapProps } from "./GameMap";
 import MapLocationMenu from "./MapLocationMenu";
 import MapTools from "./MapTools";
 import PointCard from "./PointCard";
-import { allPointCategories, mapPoints, pointLinkParam, pointTypes, type MapPoint, type PointCategory } from "./map-points";
+import { getMapFilterType, updateHiddenFilterTypes, type MapFilterType } from "./map-filter-groups";
+import { mapPoints, pointLinkParam, pointTypes, type MapPoint } from "./map-points";
 
 const tileRoot = "/maps/tiles/6/yanis,18";
 const tileSize = 256;
@@ -153,6 +154,15 @@ function MapCoordinates() {
 }
 
 function pointIcon({ category, type }: MapPoint) {
+  if (type === "treasure") {
+    return divIcon({
+      className: "map-treasure",
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+      popupAnchor: [0, -16],
+    });
+  }
+
   return divIcon({
     className: `map-pin map-pin-${category}`,
     html: `<span class="material-icon" aria-hidden="true">${pointTypes[type].icon}</span>`,
@@ -226,12 +236,11 @@ function MapLayers() {
 type PointMarkersProps = {
   points: MapPoint[];
   canManagePoints: boolean;
-  selectedCategories: Record<PointCategory, boolean>;
   selection: { point: MapPoint } | null;
   clustering: boolean;
 };
 
-function PointMarkers({ points, canManagePoints, selectedCategories, selection, clustering }: PointMarkersProps) {
+function PointMarkers({ points, canManagePoints, selection, clustering }: PointMarkersProps) {
   const map = useMap();
   const markers = useRef(new Map<string, LeafletMarker>());
   const group = useRef<MarkerClusterGroup>(null);
@@ -260,7 +269,7 @@ function PointMarkers({ points, canManagePoints, selectedCategories, selection, 
     };
   }, [map, selection]);
 
-  const visibleMarkers = useMemo(() => points.filter(({ category }) => selectedCategories[category]).map((point) => (
+  const visibleMarkers = useMemo(() => points.map((point) => (
     <Marker
       key={point.id}
       ref={(marker) => {
@@ -275,13 +284,15 @@ function PointMarkers({ points, canManagePoints, selectedCategories, selection, 
         <PointCard point={point} canManagePoint={canManagePoints} />
       </Popup>
     </Marker>
-  )), [points, canManagePoints, selectedCategories]);
+  )), [points, canManagePoints]);
 
   return clustering ? (
     <ClusterGroup
       ref={group}
       iconCreateFunction={clusterIcon}
       maxClusterRadius={56}
+      disableClusteringAtZoom={maxZoom}
+      spiderfyOnMaxZoom={false}
       showCoverageOnHover={false}
       animate={false}
     >
@@ -302,7 +313,8 @@ export default function LeafletGameMap({ hiddenPointIds, publishedPoints, canMan
       showLocationMarker: params.get(mapViewOnlyParam) !== "1",
     };
   });
-  const [selectedCategories, setSelectedCategories] = useState(allPointCategories);
+  const [hiddenTypes, setHiddenTypes] = useState<ReadonlySet<MapFilterType>>(() => new Set());
+  const visiblePoints = useMemo(() => points.filter(({ type }) => !hiddenTypes.has(getMapFilterType(type))), [points, hiddenTypes]);
   const [selection, setSelection] = useState<PointMarkersProps["selection"]>(() => {
     const pointId = new URLSearchParams(window.location.search).get(pointLinkParam);
     const point = points.find(({ id }) => id === pointId);
@@ -331,7 +343,8 @@ export default function LeafletGameMap({ hiddenPointIds, publishedPoints, canMan
   }
 
   const selectPoint = useCallback((point: MapPoint) => {
-    setSelectedCategories((previous) => previous[point.category] ? previous : { ...previous, [point.category]: true });
+    const type = getMapFilterType(point.type);
+    setHiddenTypes((previous) => previous.has(type) ? updateHiddenFilterTypes(previous, [type], true) : previous);
     setSelection({ point });
   }, []);
 
@@ -340,9 +353,9 @@ export default function LeafletGameMap({ hiddenPointIds, publishedPoints, canMan
       <MapTools
         points={points}
         canManagePoints={canManagePoints}
-        selectedCategories={selectedCategories}
-        onCategoryChange={(category, checked) =>
-          setSelectedCategories((previous) => ({ ...previous, [category]: checked }))
+        hiddenTypes={hiddenTypes}
+        onTypesChange={(types, visible) =>
+          setHiddenTypes((previous) => updateHiddenFilterTypes(previous, types, visible))
         }
         onPointSelect={selectPoint}
         clustering={clustering}
@@ -376,9 +389,8 @@ export default function LeafletGameMap({ hiddenPointIds, publishedPoints, canMan
           onPointAdded={selectPoint}
         />
         <PointMarkers
-          points={points}
+          points={visiblePoints}
           canManagePoints={canManagePoints}
-          selectedCategories={selectedCategories}
           selection={selection}
           clustering={clustering}
         />

@@ -90,12 +90,15 @@ async function readPointTable(client: SupabaseClient, prefix: "A" | "S", id?: st
       if (!isUuid(rowId) || !isPublishedPointCategory(row.category) || !isPublishedPointType(row.type)) {
         continue;
       }
+      // Keep the published Barnacle Beauties point categorized before the database migration is applied.
+      const legacyBarnacleBeauties = prefix === "S" && rowId === "93f1f9c4-dbe0-45d3-a597-fe4e8959519d"
+        && row.category === "city" && row.type === "service";
       points.push({
         id: `${prefix}${rowId}`,
         name: row.name,
         description: row.description ?? undefined,
-        category: row.category,
-        type: row.type,
+        category: legacyBarnacleBeauties ? "hairdresser" : row.category,
+        type: legacyBarnacleBeauties ? "hairSalon" : row.type,
         x: Number(row.x),
         y: Number(row.y),
       });

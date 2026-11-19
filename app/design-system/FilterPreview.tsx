@@ -3,21 +3,20 @@
 import { useState } from "react";
 import MaterialIcon from "@/components/MaterialIcon";
 import MapFilters from "@/components/map/MapFilters";
-import { allPointCategories, pointCategories, pointTypes, visiblePointCategories } from "@/components/map/map-points";
+import { getMapFilterType, updateHiddenFilterTypes, type MapFilterType } from "@/components/map/map-filter-groups";
+import { pointCategories, pointTypes } from "@/components/map/map-points";
 import styles from "./design-system.module.css";
 
 const previewPins = [
   { category: "nature", type: "mountain", left: "58%", top: "30%" },
   { category: "landmark", type: "bar", left: "28%", top: "56%" },
-  { category: "city", type: "shop", left: "73%", top: "68%" },
-  { category: "uncategorized", type: "unknown", left: "47%", top: "79%" },
+  { category: "city", type: "clothingStore", left: "73%", top: "68%" },
+  { category: "hairdresser", type: "hairSalon", left: "47%", top: "79%" },
 ] as const;
 
-const availablePins = previewPins.filter(({ category }) => visiblePointCategories.includes(category));
-
 export default function FilterPreview() {
-  const [selectedCategories, setSelectedCategories] = useState(allPointCategories);
-  const visiblePins = availablePins.filter(({ category }) => selectedCategories[category]);
+  const [hiddenTypes, setHiddenTypes] = useState<ReadonlySet<MapFilterType>>(() => new Set());
+  const visiblePins = previewPins.filter(({ type }) => !hiddenTypes.has(getMapFilterType(type)));
 
   return (
     <div className={`map-glass ${styles.preview}`}>
@@ -25,9 +24,10 @@ export default function FilterPreview() {
         <h3>Filtry</h3>
         <p>Zapni nebo vypni kategorii a sleduj značky v náhledu.</p>
         <MapFilters
-          selectedCategories={selectedCategories}
-          onCategoryChange={(category, checked) =>
-            setSelectedCategories((previous) => ({ ...previous, [category]: checked }))
+          points={previewPins}
+          hiddenTypes={hiddenTypes}
+          onTypesChange={(types, visible) =>
+            setHiddenTypes((previous) => updateHiddenFilterTypes(previous, types, visible))
           }
         />
       </div>
@@ -50,7 +50,7 @@ export default function FilterPreview() {
             ))}
           </ul>
           <span className={`map-glass ${styles.previewStatus}`} role="status">
-            Zobrazené značky {visiblePins.length} z {availablePins.length}
+            Zobrazené značky {visiblePins.length} z {previewPins.length}
           </span>
         </div>
         <figcaption>

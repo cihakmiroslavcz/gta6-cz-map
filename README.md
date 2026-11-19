@@ -21,7 +21,7 @@ Podklady Yanis V18 poskytuje gtadb.org pod licencí [CC BY 4.0](https://creative
 
 ## Body zájmu a legenda
 
-Mapa používá výběr z [dat GTADB pro GTA VI](https://github.com/rolux/gtadb.org/blob/main/map/data/6/landmarks.json) z 18. listopadu 2026 v souboru `components/map/gtadb-points.json`. Výběr obsahuje 946 míst, která mají název i herní souřadnice. Souřadnice jsou zaokrouhlené na desetiny metru, značky mají české kategorie odvozené ze zdrojových štítků a ručně upravená místa jsou v `components/map/map-points.ts`. Data vytvořili gtadb.org a přispěvatelé pod licencí [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Česká legenda používá výřezy symbolů z původní legendy Yanis V18.
+Mapa používá výběr z [dat GTADB pro GTA VI](https://github.com/rolux/gtadb.org/blob/main/map/data/6/landmarks.json) v souboru `components/map/gtadb-points.json`. K výběru 946 pojmenovaných míst z 18. listopadu 2026 je přidáno pět nepotvrzených kadeřnictví. Souřadnice jsou zaokrouhlené na desetiny metru, značky mají české kategorie odvozené ze zdrojových štítků a ručně upravená místa jsou v `components/map/map-points.ts`. Data vytvořili gtadb.org a přispěvatelé pod licencí [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Česká legenda používá výřezy symbolů z původní legendy Yanis V18.
 
 Obecné názvy bodů se překládají podle seznamu `genericPointNames` v `components/map/map-points.ts` při shodě celého názvu. Vlastní jména, názvy podniků a značky zůstávají ve zdrojovém znění. Přeložený bod lze najít i podle původního názvu.
 
@@ -56,6 +56,8 @@ Pro ukládání návrhů míst spusť také [migraci map_suggestions.sql](supaba
 Pro schvalování spusť [migraci map_suggestion_reviews.sql](supabase/migrations/20261118000002_map_suggestion_reviews.sql). Na `/admin` otevři **Posoudit návrh**, uprav veřejný název a popis, vyber kategorii a typ a zvol **Schválit a přidat na mapu**. Zveřejněný pin má vlastní odkaz a lze jej skrýt nebo obnovit stejně jako body GTADB.
 
 Pro přidávání bodů přímo z mapy spusť [migraci map_admin_points.sql](supabase/migrations/20261119000000_map_admin_points.sql). Po přihlášení správce klikni pravým tlačítkem na vybrané místo a zvol **Přidat bod**. Vyplň název, kategorii a typ, případně popis. Tlačítko **Přidat na mapu** bod rovnou zveřejní na vybraných souřadnicích.
+
+Pro ukládání a schvalování bodů v kategorii **Kadeřnictví** spusť [migraci map_hairdresser_category.sql](supabase/migrations/20261119000001_map_hairdresser_category.sql). Migrace zařadí do stejné kategorie také existující bod Barnacle Beauties.
 
 ## Písmo a ikony
 

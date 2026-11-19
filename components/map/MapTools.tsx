@@ -5,7 +5,8 @@ import MaterialIcon from "@/components/MaterialIcon";
 import { mapContactEmail } from "@/lib/map-contact";
 import { isMapPointId } from "@/lib/map-point-id";
 import MapFilters, { type MapFiltersProps } from "./MapFilters";
-import { countPointCategories, pointCategories, pointTypes, type MapPoint } from "./map-points";
+import { getMapFilterType } from "./map-filter-groups";
+import { pointCategories, pointTypes, type MapPoint } from "./map-points";
 
 const legendSections = [
   {
@@ -34,7 +35,7 @@ const legendSections = [
   },
 ];
 
-type MapToolsProps = MapFiltersProps & {
+type MapToolsProps = Omit<MapFiltersProps, "points"> & {
   points: MapPoint[];
   canManagePoints: boolean;
   onPointSelect: (point: MapPoint) => void;
@@ -66,8 +67,8 @@ const searchLimit = 40;
 export default function MapTools({
   points,
   canManagePoints,
-  selectedCategories,
-  onCategoryChange,
+  hiddenTypes,
+  onTypesChange,
   onPointSelect,
   clustering,
   onClusteringChange,
@@ -77,7 +78,6 @@ export default function MapTools({
   const searchPanel = useRef<HTMLDivElement>(null);
   const searchInput = useRef<HTMLInputElement>(null);
   const searchablePoints = useMemo(() => points.map(indexPoint), [points]);
-  const categoryCounts = useMemo(() => countPointCategories(points), [points]);
   const searchTerm = normalizeSearch(query);
   const searchWords = searchTerm.split(" ");
   const exactPoint = isMapPointId(searchTerm.charAt(0).toUpperCase() + searchTerm.slice(1))
@@ -151,8 +151,8 @@ export default function MapTools({
                   <button type="button" onClick={() => selectPoint(point)}>
                     {point.name}
                     <small>{point.sourceName && point.location ? point.location : pointTypes[point.type].label}</small>
-                    {!selectedCategories[point.category] && (
-                      <small>Skryto filtrem · výběr zapne kategorii</small>
+                    {hiddenTypes.has(getMapFilterType(point.type)) && (
+                      <small>Skryto filtrem · výběr zapne podkategorii</small>
                     )}
                   </button>
                 </li>
@@ -201,11 +201,11 @@ export default function MapTools({
             <span className="map-tool-label">Nastavení</span>
           </button>
         </div>
-        <div id="map-filter-panel" className="map-tools-panel map-glass" hidden={openPanel !== "filters"}>
+        <div id="map-filter-panel" className="map-tools-panel map-filter-panel map-glass" hidden={openPanel !== "filters"}>
           <MapFilters
-            selectedCategories={selectedCategories}
-            onCategoryChange={onCategoryChange}
-            categoryCounts={categoryCounts}
+            points={points}
+            hiddenTypes={hiddenTypes}
+            onTypesChange={onTypesChange}
           />
         </div>
         <div id="map-legend-panel" className="map-tools-panel map-glass" hidden={openPanel !== "legend"}>
@@ -235,7 +235,7 @@ export default function MapTools({
         >
           <h2 id="map-settings-title">Nastavení</h2>
           <label className="map-filter-option">
-            <span>Seskupovat značky</span>
+            <span>Seskupovat značky při oddálení</span>
             <input
               className="map-switch"
               type="checkbox"

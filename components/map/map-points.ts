@@ -3,18 +3,13 @@ import gtadbPoints from "./gtadb-points.json";
 
 export const pointCategories = {
   city: "Budovy a služby",
+  hairdresser: "Kadeřnictví",
   nature: "Příroda",
   landmark: "Zajímavosti",
   uncategorized: "Nezařazené",
 } as const;
 
 export type PointCategory = keyof typeof pointCategories;
-export const allPointCategories: Record<PointCategory, boolean> = {
-  city: true,
-  nature: true,
-  landmark: true,
-  uncategorized: true,
-};
 
 export const pointLinkParam = "bod";
 
@@ -27,6 +22,11 @@ export const pointTypes = {
   pawnshop: { icon: "sell", label: "Zastavárna", aliases: ["zastavárny", "pawnshop", "pawn shop"] },
   bar: { icon: "local_bar", label: "Bar", aliases: ["bary", "hospoda", "pub"] },
   shop: { icon: "storefront", label: "Obchod", aliases: ["obchody", "prodejna", "shop", "store"] },
+  clothingStore: { icon: "apparel", label: "Obchod s oblečením", aliases: ["oděvy", "móda", "triko", "clothes", "fashion"] },
+  shoeStore: { icon: "steps", label: "Obuv", aliases: ["obchod s obuví", "boty", "shoe shop"] },
+  electronicsStore: { icon: "devices", label: "Prodejna elektroniky", aliases: ["elektronika", "electronics"] },
+  liquorStore: { icon: "liquor", label: "Prodejna alkoholu", aliases: ["alkohol", "liquor store"] },
+  motorcycleShop: { icon: "two_wheeler", label: "Obchod s motocykly", aliases: ["motorky", "motorcycle shop"] },
   stripclub: { icon: "favorite", label: "Strip klub", aliases: ["stripclub", "strip club", "stripklub", "striptýz"] },
   museum: { icon: "museum", label: "Muzeum", aliases: ["muzea", "museum"] },
   marina: { icon: "anchor", label: "Přístav", aliases: ["přístavy", "marina", "kotviště"] },
@@ -36,6 +36,7 @@ export const pointTypes = {
   bridge: { icon: "alt_route", label: "Most", aliases: ["mosty", "bridge"] },
   supermarket: { icon: "shopping_cart", label: "Supermarket", aliases: ["potraviny", "obchod", "prodejna"] },
   lake: { icon: "water", label: "Jezero", aliases: ["jezera", "lake"] },
+  waterway: { icon: "water", label: "Řeka nebo kanál", aliases: ["řeky", "vodní tok", "river", "canal"] },
   park: { icon: "park", label: "Park", aliases: ["parky"] },
   lighthouse: { icon: "flare", label: "Maják", aliases: ["majáky", "lighthouse"] },
   tattoo: { icon: "ink_pen", label: "Tetovací studio", aliases: ["tetování", "tattoo", "tatér"] },
@@ -43,18 +44,39 @@ export const pointTypes = {
   hospital: { icon: "local_hospital", label: "Nemocnice", aliases: ["hospital", "špitál"] },
   ridge: { icon: "landscape", label: "Hřeben", aliases: ["hřebeny", "ridge"] },
   restaurant: { icon: "restaurant", label: "Restaurace", aliases: ["restaurace", "bistro", "fast food", "jídlo"] },
-  transit: { icon: "directions_bus", label: "Doprava", aliases: ["autobus", "vlak", "metro", "stanice", "zastávka"] },
+  transit: { icon: "directions_transit", label: "Doprava", aliases: ["autobus", "vlak", "metro", "stanice", "zastávka"] },
   busStop: { icon: "directions_bus", label: "Autobusová zastávka", aliases: ["autobus", "autobusové zastávky", "bus stops", "doprava"] },
+  trainStation: { icon: "train", label: "Železniční stanice", aliases: ["vlak", "nádraží", "train station"] },
+  metroStation: { icon: "subway", label: "Stanice metra", aliases: ["metro", "metromover", "subway"] },
+  parking: { icon: "local_parking", label: "Parkoviště", aliases: ["parkování", "parking", "car park"] },
+  tunnel: { icon: "road", label: "Tunel", aliases: ["tunely", "tunnel"] },
   publicBuilding: { icon: "account_balance", label: "Veřejná budova", aliases: ["úřad", "radnice", "soud"] },
   police: { icon: "local_police", label: "Policie", aliases: ["policejní stanice", "police"] },
   industrial: { icon: "factory", label: "Průmyslový objekt", aliases: ["průmysl", "továrna", "výroba"] },
   residential: { icon: "apartment", label: "Bydlení", aliases: ["dům", "byt", "rezidence"] },
   office: { icon: "business_center", label: "Kanceláře", aliases: ["kancelář", "office"] },
   service: { icon: "build", label: "Služby", aliases: ["servis", "service"] },
-  gunShop: { icon: "storefront", label: "Obchod se zbraněmi", aliases: ["zbraně", "ammu nation", "prodejna"] },
+  carWash: { icon: "local_car_wash", label: "Automyčka", aliases: ["myčka", "car wash"] },
+  autoShop: { icon: "car_repair", label: "Autoservis a autodíly", aliases: ["servis", "tuning", "autodíly", "auto shop"] },
+  pharmacy: { icon: "local_pharmacy", label: "Lékárna", aliases: ["lékárny", "pharmacy"] },
+  hairSalon: { icon: "content_cut", label: "Kadeřnický salon", aliases: ["kadeřnice", "kadeřník", "hairdresser", "hair salon"] },
+  barberShop: { icon: "content_cut", label: "Barbershop", aliases: ["barber shop", "barber", "holič", "holičství", "pánské kadeřnictví"] },
+  gunShop: { icon: "target", label: "Obchod se zbraněmi", aliases: ["zbraně", "ammu nation", "prodejna"] },
   naturalSite: { icon: "landscape", label: "Přírodní místo", aliases: ["příroda", "natural"] },
   attraction: { icon: "star", label: "Pamětihodnost", aliases: ["zajímavost", "památka", "monument"] },
+  treasure: { icon: "sell", label: "Poklad", aliases: ["poklady", "peníze", "hotovost", "skrýš", "money", "cash", "treasure"] },
   leisure: { icon: "sports_esports", label: "Volný čas", aliases: ["sport", "zábava", "rekreace"] },
+  gym: { icon: "fitness_center", label: "Posilovna", aliases: ["fitness", "gym"] },
+  golfCourse: { icon: "golf_course", label: "Golfové hřiště", aliases: ["golf", "golf club"] },
+  racetrack: { icon: "sports_score", label: "Závodní okruh", aliases: ["závody", "závodní dráha", "racetrack", "raceway"] },
+  tennis: { icon: "sports_tennis", label: "Tenisový areál", aliases: ["tenis", "tenisový kurt", "tennis"] },
+  volleyball: { icon: "sports_volleyball", label: "Volejbalové hřiště", aliases: ["volejbal", "volleyball"] },
+  cinema: { icon: "theaters", label: "Kino", aliases: ["kina", "cinema"] },
+  ferrisWheel: { icon: "attractions", label: "Vyhlídkové kolo", aliases: ["ruské kolo", "ferris wheel"] },
+  casino: { icon: "casino", label: "Kasino", aliases: ["kasina", "casino"] },
+  waterTower: { icon: "water_drop", label: "Vodárenská věž", aliases: ["vodojem", "water tower"] },
+  transmitter: { icon: "cell_tower", label: "Vysílač", aliases: ["rádiový stožár", "cell tower", "radio tower"] },
+  church: { icon: "church", label: "Kostel", aliases: ["kostely", "church"] },
   event: { icon: "event", label: "Místo události", aliases: ["událost", "event"] },
   unknown: { icon: "location_on", label: "Neurčený typ", aliases: [] },
 } satisfies Record<string, { icon: MaterialIconName; label: string; aliases: string[] }>;
@@ -347,6 +369,7 @@ const curatedPoints: MapPoint[] = [
 
 // Specific GTADB tags take precedence over general classifications.
 const tagTypes: ReadonlyArray<[MapPoint["type"], PointCategory, string[]]> = [
+  ["hairSalon", "hairdresser", ["#hair"]],
   ["gasStation", "city", ["#gas"]],
   ["supermarket", "city", ["#supermarket", "supermarket"]],
   ["marina", "landmark", ["#marina"]],
@@ -354,25 +377,67 @@ const tagTypes: ReadonlyArray<[MapPoint["type"], PointCategory, string[]]> = [
   ["hospital", "city", ["#hospital"]],
   ["police", "city", ["#police"]],
   ["tattoo", "city", ["#tattoos"]],
+  ["pawnshop", "landmark", ["#fence"]],
   ["gunShop", "city", ["#guns"]],
   ["stripclub", "landmark", ["#stripclub"]],
   ["nightclub", "landmark", ["#nightclub"]],
   ["bar", "landmark", ["#bar", "#drinks"]],
   ["restaurant", "city", ["#food", "#fastfood", "fastfood", "restaurant"]],
-  ["transit", "city", ["#train", "#metro", "#metromover"]],
-  ["service", "city", ["#carwash", "#hair", "#modshop", "#pay'n'spray", "#pharmacy", "service"]],
-  ["leisure", "landmark", ["#cinema", "#ferriswheel", "#gym", "#racetrack", "#tennis", "#golf", "#volleyball"]],
+  ["trainStation", "city", ["#train"]],
+  ["metroStation", "city", ["#metro", "#metromover"]],
+  ["carWash", "city", ["#carwash"]],
+  ["autoShop", "city", ["#modshop", "#pay'n'spray"]],
+  ["pharmacy", "city", ["#pharmacy"]],
+  ["clothingStore", "city", ["#clothes"]],
+  ["shoeStore", "city", ["#shoes"]],
+  ["electronicsStore", "city", ["#electronics"]],
+  ["liquorStore", "city", ["#liquor"]],
+  ["motorcycleShop", "city", ["#bikeshop"]],
+  ["cinema", "landmark", ["#cinema"]],
+  ["ferrisWheel", "landmark", ["#ferriswheel"]],
+  ["gym", "landmark", ["#gym"]],
+  ["racetrack", "landmark", ["#racetrack"]],
+  ["tennis", "landmark", ["#tennis"]],
+  ["golfCourse", "landmark", ["#golf"]],
+  ["volleyball", "landmark", ["#volleyball"]],
+  ["service", "city", ["service"]],
   ["naturalSite", "nature", ["natural"]],
   ["hotel", "city", ["hotel"]],
   ["residential", "city", ["residential", "#safehouse"]],
   ["office", "city", ["office"]],
   ["industrial", "city", ["industrial", "agriculture", "utilities"]],
   ["publicBuilding", "city", ["government", "public", "#jail"]],
-  ["shop", "city", ["retail", "#bikeshop", "#clothes", "#electronics", "#liquor", "#shoes", "#vendor"]],
+  ["shop", "city", ["retail", "#vendor"]],
   ["transit", "city", ["transportation"]],
   ["attraction", "landmark", ["landmark", "point-of-interest"]],
   ["event", "landmark", ["events"]],
   ["leisure", "landmark", ["leisure", "recreation"]],
+];
+
+// Explicit names identify points which have a broad or missing GTADB tag.
+const namedTypes: ReadonlyArray<[MapPoint["type"], PointCategory, RegExp]> = [
+  ["busStop", "city", /^bus stop$/],
+  ["barberShop", "hairdresser", /\bbarber\s*shop$/],
+  ["clothingStore", "city", /\bclothing(?: store| shop)?$/],
+  ["gasStation", "city", /\bgas (?:station|stop)$/],
+  ["trainStation", "city", /\btrain station$/],
+  ["metroStation", "city", /\bmetro(?: mover)? station$/],
+  ["bridge", "city", /(?:\bbridge|\bfootbridge)$/],
+  ["tunnel", "city", /\btunnel(?: entrance)?$/],
+  ["parking", "city", /^(?:car park|parking (?:lot|garage))$/],
+  ["lake", "nature", /(?:^lake\b|\blake$)/],
+  ["waterway", "nature", /\b(?:river|canal)"?$/],
+  ["park", "nature", /^park$/],
+  ["hill", "nature", /\bhill"?$/],
+  ["mountain", "nature", /\bmountain"?$/],
+  ["marina", "landmark", /\bmarina$/],
+  ["lighthouse", "landmark", /\blighthouse$/],
+  ["casino", "landmark", /\bcasino$/],
+  ["tennis", "landmark", /^tennis (?:courts?|stadium)$/],
+  ["waterTower", "city", /\bwater tower$/],
+  ["warehouse", "city", /\bwarehouse$/],
+  ["transmitter", "city", /^(?:cell tower|radio tower|radio mast|broadcast tower)$/],
+  ["church", "city", /\bchurch$/],
 ];
 
 // Translate whole generic labels only. A label containing a proper name keeps its original wording.
@@ -397,6 +462,7 @@ const genericPointNames = new Map([
   ["footbridge", "Lávka"],
   ["gas station", "Čerpací stanice"],
   ["grandstands", "Tribuny"],
+  ["hair salon", "Kadeřnictví"],
   ["guard booth", "Strážní budka"],
   ["hospital", "Nemocnice"],
   ["interchange", "Mimoúrovňová křižovatka"],
@@ -437,10 +503,11 @@ function importPoint({ id, name, x, y, location, tags = [] }: typeof gtadbPoints
   const uncertainName = name.endsWith("?");
   const genericName = name.replace(/\s*\?$/, "").toLowerCase();
   const translatedName = genericPointNames.get(genericName);
-  const genericBusStopName = genericName === "bus stop";
-  const [type, category] = genericBusStopName || tags.includes("#bus")
+  const [type, category] = tags.includes("#bus")
     ? (["busStop", "city"] as const)
-    : tagTypes.find(([, , keys]) => keys.some((key) => tags.includes(key))) ?? ["unknown", "uncategorized"];
+    : namedTypes.find(([, , pattern]) => pattern.test(genericName))
+      ?? tagTypes.find(([, , keys]) => keys.some((key) => tags.includes(key)))
+      ?? ["unknown", "uncategorized"];
 
   return {
     id,
@@ -466,7 +533,7 @@ export function countPointCategories(points: MapPoint[]) {
   return points.reduce((counts, { category }) => {
     counts[category] += 1;
     return counts;
-  }, { city: 0, nature: 0, landmark: 0, uncategorized: 0 });
+  }, { city: 0, hairdresser: 0, nature: 0, landmark: 0, uncategorized: 0 });
 }
 
 export const pointCategoryCounts = countPointCategories(mapPoints);
