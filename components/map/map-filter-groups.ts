@@ -1,4 +1,4 @@
-import { pointCategories, pointTypes, publishedPointCategories, type MapPoint } from "./map-points";
+import { getPointTypes, pointCategories, pointTypes, publishedPointCategories, type MapPoint } from "./map-points";
 
 export type MapFilterType = Exclude<MapPoint["type"], "barberShop">;
 
@@ -17,6 +17,9 @@ export function updateHiddenFilterTypes(hiddenTypes: ReadonlySet<MapFilterType>,
 
 export function getMapFilterGroups(points: readonly Pick<MapPoint, "type">[]) {
   const counts = new Map<MapFilterType, number>();
+  if (points.length > 0) {
+    for (const type of getPointTypes("robberies")) counts.set(getMapFilterType(type), 0);
+  }
   for (const point of points) {
     const type = getMapFilterType(point.type);
     counts.set(type, (counts.get(type) ?? 0) + 1);

@@ -960,8 +960,16 @@ a.point-report:hover {
   cursor: pointer;
 }
 
-.map-filter-row:hover {
+.map-filter-row:hover:not(:has(.map-switch:disabled)) {
   background: #afdbff24;
+}
+
+:is(.map-filter-toggle, .map-filter-row):has(.map-switch:disabled) {
+  cursor: default;
+}
+
+.map-switch:disabled {
+  opacity: 0.45;
 }
 
 .map-filter-toggle .map-switch,

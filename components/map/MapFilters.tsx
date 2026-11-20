@@ -17,6 +17,7 @@ const countFormat = new Intl.NumberFormat("cs-CZ");
 function MapFilterGroup({ group, hiddenTypes, onTypesChange }: { group: FilterGroup } & Omit<MapFiltersProps, "points">) {
   const controlsId = useId();
   const [expanded, setExpanded] = useState(false);
+  const populatedRows = group.rows.filter(({ count }) => count > 0);
   const total = group.rows.reduce((count, row) => count + row.count, 0);
   const visible = group.rows.reduce((count, row) => count + (hiddenTypes.has(row.type) ? 0 : row.count), 0);
 
@@ -40,10 +41,11 @@ function MapFilterGroup({ group, hiddenTypes, onTypesChange }: { group: FilterGr
           <input
             className="map-switch"
             type="checkbox"
-            checked={visible === total}
+            checked={total > 0 && visible === total}
+            disabled={total === 0}
             aria-label={`Zobrazit skupinu ${group.label}`}
             ref={(input) => { if (input) input.indeterminate = visible > 0 && visible < total; }}
-            onChange={(event) => onTypesChange(group.rows.map(({ type }) => type), event.target.checked)}
+            onChange={(event) => onTypesChange(populatedRows.map(({ type }) => type), event.target.checked)}
           />
         </label>
       </div>
@@ -58,7 +60,8 @@ function MapFilterGroup({ group, hiddenTypes, onTypesChange }: { group: FilterGr
                 className="map-switch"
                 type="checkbox"
                 role="switch"
-                checked={!hiddenTypes.has(type)}
+                checked={count > 0 && !hiddenTypes.has(type)}
+                disabled={count === 0}
                 onChange={(event) => onTypesChange([type], event.target.checked)}
               />
             </label>
