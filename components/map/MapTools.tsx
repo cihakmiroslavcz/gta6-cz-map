@@ -5,6 +5,7 @@ import MaterialIcon from "@/components/MaterialIcon";
 import { mapContactEmail } from "@/lib/map-contact";
 import { isMapPointId } from "@/lib/map-point-id";
 import MapFilters, { type MapFiltersProps } from "./MapFilters";
+import { indexMapAreas, normalizeSearch, searchMapAreas, type MapArea } from "./map-area-search";
 import type { BaseMap, LeonidaStatus, LeonidaVariant } from "./map-basemaps";
 import { getMapFilterType } from "./map-filter-groups";
 import { pointCategories, pointTypes, type MapPoint } from "./map-points";
@@ -40,6 +41,7 @@ type MapToolsProps = Omit<MapFiltersProps, "points"> & {
   points: MapPoint[];
   canManagePoints: boolean;
   onPointSelect: (point: MapPoint) => void;
+  onAreaSelect: (area: MapArea) => void;
   clustering: boolean;
   onClusteringChange: (enabled: boolean) => void;
   basemap: {
@@ -129,15 +131,6 @@ function BasemapSettings({
   );
 }
 
-function normalizeSearch(text: string) {
-  return text
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLocaleLowerCase("cs-CZ")
-    .trim()
-    .replace(/\s+/g, " ");
-}
-
 function indexPoint(point: MapPoint) {
   const { label, aliases } = pointTypes[point.type];
   return {
@@ -149,6 +142,7 @@ function indexPoint(point: MapPoint) {
 }
 
 const searchLimit = 40;
+const areaSearchLimit = 6;
 
 export default function MapTools({
   points,
@@ -156,6 +150,7 @@ export default function MapTools({
   hiddenTypes,
   onTypesChange,
   onPointSelect,
+  onAreaSelect,
   clustering,
   onClusteringChange,
   basemap,
@@ -165,6 +160,7 @@ export default function MapTools({
   const searchPanel = useRef<HTMLDivElement>(null);
   const searchInput = useRef<HTMLInputElement>(null);
   const searchablePoints = useMemo(() => points.map(indexPoint), [points]);
+  const searchableAreas = useMemo(() => indexMapAreas(points), [points]);
   const searchTerm = normalizeSearch(query);
   const searchWords = searchTerm.split(" ");
   const exactPoint = isMapPointId(searchTerm.charAt(0).toUpperCase() + searchTerm.slice(1))
@@ -175,6 +171,7 @@ export default function MapTools({
       .filter(({ searchText }) => searchWords.every((word) => searchText.includes(word)))
       .map(({ point }) => point)
     : [];
+  const areaResults = exactPoint ? [] : searchMapAreas(searchableAreas, searchTerm);
 
   useEffect(() => {
     if (openPanel !== "search") return;
@@ -189,10 +186,19 @@ export default function MapTools({
     return () => document.removeEventListener("pointerdown", closeOnOutsidePress, true);
   }, [openPanel]);
 
-  function selectPoint(point: MapPoint) {
-    onPointSelect(point);
+  function closeSearch() {
     setOpenPanel(null);
     searchInput.current?.blur();
+  }
+
+  function selectPoint(point: MapPoint) {
+    onPointSelect(point);
+    closeSearch();
+  }
+
+  function selectArea(area: MapArea) {
+    onAreaSelect(area);
+    closeSearch();
   }
 
   return (
@@ -203,7 +209,8 @@ export default function MapTools({
           role="search"
           onSubmit={(event) => {
             event.preventDefault();
-            if (results[0]) selectPoint(results[0]);
+            if (areaResults[0]) selectArea(areaResults[0]);
+            else if (results[0]) selectPoint(results[0]);
           }}
         >
           <MaterialIcon name="search" />
@@ -211,9 +218,9 @@ export default function MapTools({
             id="map-search-input"
             ref={searchInput}
             type="search"
-            aria-label="Název nebo typ místa"
+            aria-label="Hledat místo, oblast nebo typ"
             aria-controls="map-search-panel"
-            placeholder="Místo nebo typ"
+            placeholder="Místo nebo oblast"
             value={query}
             onFocus={() => setOpenPanel("search")}
             onClick={() => setOpenPanel("search")}
@@ -231,7 +238,19 @@ export default function MapTools({
           className="map-tools-panel map-glass map-search-results"
           hidden={openPanel !== "search" || !searchTerm}
         >
-          {results.length > 0 ? (
+          {areaResults.length > 0 && (
+            <ul aria-label="Nalezené oblasti">
+              {areaResults.slice(0, areaSearchLimit).map((area) => (
+                <li key={area.key}>
+                  <button className="map-search-area" type="button" onClick={() => selectArea(area)}>
+                    <MaterialIcon name="map" />
+                    <span>{area.name}<small>Oblast na mapě</small></span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          {results.length > 0 && (
             <ul aria-label="Výsledky hledání">
               {results.slice(0, searchLimit).map((point) => (
                 <li key={point.id}>
@@ -245,7 +264,8 @@ export default function MapTools({
                 </li>
               ))}
             </ul>
-          ) : (
+          )}
+          {areaResults.length === 0 && results.length === 0 && (
             <p className="map-search-empty" role="status">Žádné místo nenalezeno.</p>
           )}
           {results.length > searchLimit && (
@@ -365,7 +385,10 @@ export default function MapTools({
               <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
               Původní postranní panel mapy je zakrytý.
             </p>
-            <p>Oficiální mapa Leonidy © Rockstar Games.</p>
+            <p>
+              Oficiální mapa Leonidy © Rockstar Games.{" "}
+              <a href="https://www.rockstargames.com/VI/media/artwork-wallpapers">Stáhnout mapu u Rockstar Games</a>.
+            </p>
             <p>
               Data bodů vytvořili <a href="https://github.com/rolux/gtadb.org/blob/main/map/data/6/landmarks.json">GTADB
               a přispěvatelé</a> pod licencí{" "}
