@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import MaterialIcon from "@/components/MaterialIcon";
 import { MapFeedbackForm, MapFeedbackPage } from "@/components/MapFeedback";
+import PointClassificationFields from "@/components/map/PointClassificationFields";
 import { pointLinkParam, type MapPoint } from "@/components/map/map-points";
 import { publicMapOrigin } from "@/lib/map-contact";
 import { isMapPointId } from "@/lib/map-point-id";
@@ -61,6 +62,7 @@ function ReportForm({ point, mapHref }: { point: MapPoint; mapHref: string }) {
         </p>
       </div>
 
+      <PointClassificationFields fieldClassName={styles.field} report />
     </MapFeedbackForm>
   );
 }

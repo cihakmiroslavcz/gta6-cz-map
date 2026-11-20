@@ -21,7 +21,7 @@ function MapFilterGroup({ group, hiddenTypes, onTypesChange }: { group: FilterGr
   const visible = group.rows.reduce((count, row) => count + (hiddenTypes.has(row.type) ? 0 : row.count), 0);
 
   return (
-    <section className="map-filter-group" data-group={group.id} aria-label={group.label}>
+    <section className="map-filter-group" data-category={group.id} aria-label={group.label}>
       <div className="map-filter-group-header">
         <button
           type="button"

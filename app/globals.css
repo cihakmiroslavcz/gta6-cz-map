@@ -26,16 +26,6 @@
   --glass-base: #092541bd;
   --filter-accent: #9af3df;
   --map-switch-on: #ff42ac;
-  --point-city-color: #9edbff;
-  --point-hairdresser-color: #ffa9d3;
-  --point-nature-color: #b6eb91;
-  --point-landmark-color: #ffd298;
-  --point-uncategorized-color: #d7c5ff;
-  --point-city-fill: #096e9b;
-  --point-hairdresser-fill: #b32367;
-  --point-nature-fill: #18784d;
-  --point-landmark-fill: #97511a;
-  --point-uncategorized-fill: #6943ac;
   --map-cluster-small-fill: #485bc1;
   --map-cluster-medium-fill: #257746;
   --map-cluster-large-fill: #b74712;
@@ -500,24 +490,8 @@ body {
   font-weight: 600;
 }
 
-.point-chip-category[data-category="city"] {
-  --chip-text: var(--point-city-color);
-}
-
-.point-chip-category[data-category="nature"] {
-  --chip-text: var(--point-nature-color);
-}
-
-.point-chip-category[data-category="hairdresser"] {
-  --chip-text: var(--point-hairdresser-color);
-}
-
-.point-chip-category[data-category="landmark"] {
-  --chip-text: var(--point-landmark-color);
-}
-
-.point-chip-category[data-category="uncategorized"] {
-  --chip-text: var(--point-uncategorized-color);
+.point-chip-category {
+  --chip-text: var(--point-accent, var(--glass-ink));
 }
 
 .point-card-note {
@@ -850,18 +824,11 @@ a.point-report:hover {
 }
 
 .map-filter-group {
-  --group-accent: var(--point-city-color);
+  --group-accent: var(--point-accent, var(--glass-ink));
   border: 1px solid #a6d9f229;
   border-radius: 14px;
   background: #091d33a6;
 }
-
-.map-filter-group[data-group="places"] { --group-accent: #8cdfdb; }
-.map-filter-group[data-group="shops"] { --group-accent: #cdb9ff; }
-.map-filter-group[data-group="activities"] { --group-accent: #b6eb91; }
-.map-filter-group[data-group="collectibles"] { --group-accent: #f1cc72; }
-.map-filter-group[data-group="nightlife"] { --group-accent: #ffa9d3; }
-.map-filter-group[data-group="buildings"] { --group-accent: #d1dcec; }
 
 .map-filter-group-header {
   display: flex;
@@ -962,10 +929,6 @@ a.point-report:hover {
 
 .map-filter-row:hover {
   background: #afdbff24;
-}
-
-.map-filter-row[data-type="hairSalon"] .map-filter-row-icon {
-  --group-accent: var(--point-hairdresser-color);
 }
 
 .map-filter-toggle .map-switch,
@@ -1222,25 +1185,63 @@ a.point-report:hover {
 }
 
 .map-pin {
-  --pin-fill: var(--point-city-fill);
   width: 36px;
   height: 36px;
 }
 
-.map-pin-nature {
-  --pin-fill: var(--point-nature-fill);
+:where([data-category="vehicles"], .map-pin-vehicles) {
+  --point-accent: #f8eb8c;
+  --point-fill: #756100;
 }
 
-.map-pin-hairdresser {
-  --pin-fill: var(--point-hairdresser-fill);
+:where([data-category="shop"], .map-pin-shop) {
+  --point-accent: #d5b8ff;
+  --point-fill: #6b39a9;
 }
 
-.map-pin-landmark {
-  --pin-fill: var(--point-landmark-fill);
+:where([data-category="style"], .map-pin-style) {
+  --point-accent: #ffa9d3;
+  --point-fill: #b32367;
 }
 
-.map-pin-uncategorized {
-  --pin-fill: var(--point-uncategorized-fill);
+:where([data-category="foodDrink"], .map-pin-foodDrink) {
+  --point-accent: #ffada0;
+  --point-fill: #a6382c;
+}
+
+:where([data-category="activities"], .map-pin-activities) {
+  --point-accent: #8cdfdb;
+  --point-fill: #08656b;
+}
+
+:where([data-category="collectibles"], .map-pin-collectibles) {
+  --point-accent: #ffd298;
+  --point-fill: #97511a;
+}
+
+:where([data-category="robberies"], .map-pin-robberies) {
+  --point-accent: #ff9ca1;
+  --point-fill: #8e2232;
+}
+
+:where([data-category="properties"], .map-pin-properties) {
+  --point-accent: #c6d6ef;
+  --point-fill: #455b75;
+}
+
+:where([data-category="localPlaces"], .map-pin-localPlaces) {
+  --point-accent: #9edbff;
+  --point-fill: #096e9b;
+}
+
+:where([data-category="nature"], .map-pin-nature) {
+  --point-accent: #b6eb91;
+  --point-fill: #18784d;
+}
+
+:where([data-category="uncategorized"], .map-pin-uncategorized) {
+  --point-accent: #d7c5ff;
+  --point-fill: #6943ac;
 }
 
 .map-pin::before {
@@ -1253,7 +1254,7 @@ a.point-report:hover {
   height: 28px;
   border: 2px solid #fff;
   border-radius: 50% 50% 50% 0;
-  background: var(--pin-fill);
+  background: var(--point-fill, #096e9b);
   rotate: -45deg;
   box-shadow: 0 1px 5px #122438a6;
 }
@@ -1408,7 +1409,7 @@ a.point-report:hover {
   flex: 0 0 10px;
   width: 10px;
   height: 10px;
-  background: var(--point-city-color);
+  background: var(--chip-text);
 }
 
 .map-pin .material-icon {
@@ -1420,21 +1421,13 @@ a.point-report:hover {
 }
 
 .point-nature {
-  background: var(--point-nature-color);
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
 }
 
-.point-hairdresser {
-  border-radius: 2px;
-  background: var(--point-hairdresser-color);
-}
-
-.point-landmark {
+.point-localPlaces {
   border-radius: 50%;
-  background: var(--point-landmark-color);
 }
 
 .point-uncategorized {
-  background: var(--point-uncategorized-color);
   rotate: 45deg;
 }

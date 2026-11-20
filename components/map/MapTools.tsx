@@ -136,7 +136,7 @@ function indexPoint(point: MapPoint) {
   return {
     point,
     searchText: normalizeSearch([
-      point.id, point.name, point.sourceName, point.location, label, pointCategories[point.category], ...aliases,
+      point.id, point.name, point.sourceName, point.location, label, pointCategories[point.category].label, ...aliases,
     ].join(" ")),
   };
 }
