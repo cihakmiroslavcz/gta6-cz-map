@@ -7,6 +7,7 @@ export type GameMapProps = {
   hiddenPointIds: string[];
   points: MapPoint[];
   canManagePoints: boolean;
+  isV2?: boolean;
 };
 
 const LeafletGameMap = dynamic(() => import("./LeafletGameMap"), {

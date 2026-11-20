@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { mapPoints, pointLinkParam } from "@/components/map/map-points";
+import { mapV2Path } from "@/lib/map-location";
 import { supabaseConfig } from "@/lib/supabase/config";
 import { getMapAdminClient, readMapPoints } from "@/lib/supabase/map-server";
+import { readMapV2Access } from "@/lib/supabase/map-v2";
 import { restorePoint, signIn, signOut } from "./actions";
 import SuggestionList from "./SuggestionList";
 import styles from "./admin.module.css";
@@ -18,6 +22,7 @@ const pointNames = new Map(mapPoints.map(({ id, name }) => [id, name]));
 async function AdminContent({ searchParams }: Pick<AdminPageProps, "searchParams">) {
   if (!supabaseConfig) return <p>Správa bodů zatím není propojená se Supabase.</p>;
 
+  await connection();
   const [client, params] = await Promise.all([getMapAdminClient(), searchParams]);
   if (!client) {
     return (
@@ -36,9 +41,10 @@ async function AdminContent({ searchParams }: Pick<AdminPageProps, "searchParams
     );
   }
 
-  const [{ data, error }, points] = await Promise.all([
+  const [{ data, error }, points, v2Access] = await Promise.all([
     client.from("map_hidden_points").select("point_id").order("point_id"),
     readMapPoints(),
+    readMapV2Access(client),
   ]);
   const hiddenPointNames = new Map(pointNames);
   for (const { id, name } of points ?? []) hiddenPointNames.set(id, name);
@@ -47,10 +53,12 @@ async function AdminContent({ searchParams }: Pick<AdminPageProps, "searchParams
       <div className={styles.toolbar}>
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- Leaflet needs a fresh document when returning to the map. */}
         <a href="/" className={styles.control}>Otevřít mapu</a>
+        {v2Access.allowed && <Link href={mapV2Path} prefetch={false} className={styles.control}>Otevřít mapu V2</Link>}
         <form action={signOut}>
           <button type="submit" className={styles.control}>Odhlásit se</button>
         </form>
       </div>
+      {v2Access.error && <p role="status">{v2Access.error}</p>}
       <h2>Skryté body</h2>
       {params.stav === "obnoveno" && <p role="status">Bod byl obnoven.</p>}
       {params.stav === "chyba" && <p role="alert">Bod se nepodařilo obnovit.</p>}

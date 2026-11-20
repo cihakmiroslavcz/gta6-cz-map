@@ -1,6 +1,7 @@
 export const worldHalfSize = 16384;
 export const maxZoom = 5;
 export const mapViewOnlyParam = "pohled";
+export const mapV2Path = "/admin/mapa-v2";
 
 export type MapLocation = {
   x: number;

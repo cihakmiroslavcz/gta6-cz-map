@@ -18,3 +18,7 @@ export function isMapPointId(value: unknown): value is string {
 export function isPublishedPointId(value: unknown): value is string {
   return typeof value === "string" && /^[AS]/.test(value) && isUuid(value.slice(1));
 }
+
+export function isMapV2PointId(value: unknown): value is string {
+  return typeof value === "string" && value.startsWith("V") && isUuid(value.slice(1));
+}

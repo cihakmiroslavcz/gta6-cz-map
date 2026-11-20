@@ -285,6 +285,7 @@ function CommunityLayer({ visible }: { visible: boolean }) {
 type PointMarkersProps = {
   points: MapPoint[];
   canManagePoints: boolean;
+  isV2: boolean;
   selection: { point: MapPoint } | null;
   clustering: boolean;
   onPointEdit: (point: MapPoint) => void;
@@ -308,7 +309,7 @@ function MapAreaView({ selection }: { selection: { area: MapArea } | null }) {
   return null;
 }
 
-function PointMarkers({ points, canManagePoints, selection, clustering, onPointEdit }: PointMarkersProps) {
+function PointMarkers({ points, canManagePoints, isV2, selection, clustering, onPointEdit }: PointMarkersProps) {
   const map = useMap();
   const markers = useRef(new Map<string, LeafletMarker>());
   const group = useRef<MarkerClusterGroup>(null);
@@ -354,13 +355,13 @@ function PointMarkers({ points, canManagePoints, selection, clustering, onPointE
       eventHandlers={pointMarkerEvents}
     >
       <Popup maxWidth={320} autoPanPaddingTopLeft={[16, 152]} autoPanPaddingBottomRight={[16, 136]}>
-        <PointCard point={point} canManagePoint={canManagePoints} onEdit={onPointEdit} />
+        <PointCard point={point} canManagePoint={canManagePoints} isV2={isV2} onEdit={onPointEdit} />
       </Popup>
       <Tooltip className="map-point-tooltip" direction="top" offset={[0, -5]} opacity={1}>
         <span>{point.name}</span>
       </Tooltip>
     </Marker>
-  )), [points, canManagePoints, onPointEdit]);
+  )), [points, canManagePoints, isV2, onPointEdit]);
 
   return clustering ? (
     <ClusterGroup
@@ -377,7 +378,7 @@ function PointMarkers({ points, canManagePoints, selection, clustering, onPointE
   ) : visibleMarkers;
 }
 
-export default function LeafletGameMap({ hiddenPointIds, points: allPoints, canManagePoints }: GameMapProps) {
+export default function LeafletGameMap({ hiddenPointIds, points: allPoints, canManagePoints, isV2 = false }: GameMapProps) {
   const points = useMemo(() => {
     const hidden = new Set(hiddenPointIds);
     return allPoints.filter(({ id }) => !hidden.has(id));
@@ -484,6 +485,7 @@ export default function LeafletGameMap({ hiddenPointIds, points: allPoints, canM
       <MapTools
         points={points}
         canManagePoints={canManagePoints}
+        isV2={isV2}
         hiddenTypes={hiddenTypes}
         onTypesChange={(types, visible) =>
           setHiddenTypes((previous) => updateHiddenFilterTypes(previous, types, visible))
@@ -536,11 +538,13 @@ export default function LeafletGameMap({ hiddenPointIds, points: allPoints, canM
         <MapLocationMenu
           sharedLocation={!selection && showLocationMarker ? sharedLocation : null}
           canManagePoints={canManagePoints}
+          isV2={isV2}
           onPointAdded={selectPoint}
         />
         <PointMarkers
           points={visiblePoints}
           canManagePoints={canManagePoints}
+          isV2={isV2}
           selection={selection && "point" in selection ? selection : null}
           clustering={clustering}
           onPointEdit={setEditingPoint}
@@ -550,6 +554,7 @@ export default function LeafletGameMap({ hiddenPointIds, points: allPoints, canM
         <MobileMapDialog title="Upravit bod" onClose={() => setEditingPoint(null)}>
           <PointEditorForm
             point={editingPoint}
+            isV2={isV2}
             inDialog
             onSaved={(point) => {
               setEditingPoint(null);

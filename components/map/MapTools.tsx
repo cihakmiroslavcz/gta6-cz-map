@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import MaterialIcon from "@/components/MaterialIcon";
 import { mapContactEmail } from "@/lib/map-contact";
-import { isMapPointId } from "@/lib/map-point-id";
+import { isMapPointId, isMapV2PointId } from "@/lib/map-point-id";
 import MapFilters, { type MapFiltersProps } from "./MapFilters";
 import { indexMapAreas, normalizeSearch, searchMapAreas, type MapArea } from "./map-area-search";
 import type { BaseMap, LeonidaStatus, LeonidaVariant } from "./map-basemaps";
@@ -40,6 +40,7 @@ const legendSections = [
 type MapToolsProps = Omit<MapFiltersProps, "points"> & {
   points: MapPoint[];
   canManagePoints: boolean;
+  isV2: boolean;
   onPointSelect: (point: MapPoint) => void;
   onAreaSelect: (area: MapArea) => void;
   clustering: boolean;
@@ -147,6 +148,7 @@ const areaSearchLimit = 6;
 export default function MapTools({
   points,
   canManagePoints,
+  isV2,
   hiddenTypes,
   onTypesChange,
   onPointSelect,
@@ -163,7 +165,8 @@ export default function MapTools({
   const searchableAreas = useMemo(() => indexMapAreas(points), [points]);
   const searchTerm = normalizeSearch(query);
   const searchWords = searchTerm.split(" ");
-  const exactPoint = isMapPointId(searchTerm.charAt(0).toUpperCase() + searchTerm.slice(1))
+  const isPointId = isV2 ? isMapV2PointId : isMapPointId;
+  const exactPoint = isPointId(searchTerm.charAt(0).toUpperCase() + searchTerm.slice(1))
     ? points.find(({ id }) => id.toLowerCase() === searchTerm)
     : undefined;
   const results = exactPoint ? [exactPoint] : searchTerm
@@ -355,7 +358,7 @@ export default function MapTools({
           {canManagePoints && (
             <div className="map-settings-section">
               <h3>Administrace</h3>
-              <p><a href="/admin">Správa skrytých bodů</a></p>
+              <p><a href="/admin">{isV2 ? "Správa bodů" : "Správa skrytých bodů"}</a></p>
             </div>
           )}
           <div className="map-settings-section">

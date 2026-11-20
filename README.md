@@ -85,6 +85,22 @@ Pro úpravy existujících bodů spusť [migraci map_point_edits.sql](supabase/m
 
 Pro ukládání kategorie a typu ve veřejných návrzích spusť [migraci map_point_categories.sql](supabase/migrations/20261120000000_map_point_categories.sql) a po ní [migraci map_point_taxonomy.sql](supabase/migrations/20261120000001_map_point_taxonomy.sql). Druhá migrace přeřadí uložené body a návrhy podle jejich typu do nových skupin, například **Vozidla**, **Obchody** a **Vzhled**. Všechny migrace spouštěj v pořadí podle názvu souboru, včetně mezilehlé migrace `map_hairdresser_category.sql`.
 
+## Soukromá mapa V2
+
+V SQL Editoru projektu spusť [migraci map_v2_points.sql](supabase/migrations/20261120000002_map_v2_points.sql). Mapa V2 používá přihlášení z `/admin`. Přístup k ní může mít nejvýše jeden účet ze seznamu `public.map_admins`. Pokud je v seznamu právě jeden správce, migrace mu přístup nastaví automaticky. Při více správcích ho přiřaď svému účtu v SQL Editoru.
+
+```sql
+update public.map_admins
+set manages_map_v2 = true
+where user_id = 'UUID_SPRAVCE'::uuid;
+```
+
+Pro ukládání bodů spusť po vytvoření tabulky také [migraci map_v2_optional_source.sql](supabase/migrations/20261120000003_map_v2_optional_source.sql).
+
+Po přihlášení vyber **Otevřít mapu V2**. Pravým kliknutím nebo klepnutím na mapu otevři nabídku a vyber **Přidat bod**. Zadej název, kategorii a typ. Souřadnice můžeš zpřesnit při úpravě bodu. Body V2 se ukládají do `map_v2_points` a kategorie se odvozuje ze sloupce `type` podle stejné taxonomie jako u veřejné mapy.
+
+V2 začíná prázdná. Pro budoucí přechod lze po kontrole dat použít `map_v2_points` jako zdroj veřejné mapy a pak vyřadit staré zdroje.
+
 ## Písmo a ikony
 
 [Onest](https://github.com/google/fonts/tree/main/ofl/onest) je pod licencí SIL Open Font License 1.1. [Google Material Symbols Rounded](https://developers.google.com/fonts/docs/material_symbols) jsou pod licencí Apache 2.0. Projekt používá místní výběr ikon. Texty licencí jsou ve složce `app/fonts/`.

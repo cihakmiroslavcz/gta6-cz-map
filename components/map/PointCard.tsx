@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { hidePoint } from "@/app/admin/actions";
 import MaterialIcon from "@/components/MaterialIcon";
+import { mapV2Path } from "@/lib/map-location";
 import { pointCategories, pointLinkParam, pointTypes, type MapPoint } from "./map-points";
 
 function HidePointForm({ pointId }: { pointId: string }) {
@@ -17,9 +18,10 @@ function HidePointForm({ pointId }: { pointId: string }) {
   );
 }
 
-export default function PointCard({ point, canManagePoint = false, onEdit }: {
+export default function PointCard({ point, canManagePoint = false, isV2 = false, onEdit }: {
   point: MapPoint;
   canManagePoint?: boolean;
+  isV2?: boolean;
   onEdit?: (point: MapPoint) => void;
 }) {
   const [shareStatus, setShareStatus] = useState<
@@ -27,7 +29,7 @@ export default function PointCard({ point, canManagePoint = false, onEdit }: {
   >(null);
 
   async function copyLink() {
-    const url = new URL("/", window.location.origin);
+    const url = new URL(isV2 ? mapV2Path : "/", window.location.origin);
     url.searchParams.set(pointLinkParam, point.id);
 
     try {
@@ -53,7 +55,9 @@ export default function PointCard({ point, canManagePoint = false, onEdit }: {
         </header>
         {point.description && <p>{point.description}</p>}
         {point.location && <p>{point.location}</p>}
-        <p className="point-card-note">{point.unconfirmed ? "Nepotvrzené místo · Přibližná poloha" : "Přibližná poloha"}</p>
+        {!isV2 && (
+          <p className="point-card-note">{point.unconfirmed ? "Nepotvrzené místo · Přibližná poloha" : "Přibližná poloha"}</p>
+        )}
       </div>
 
       <footer className="point-share">
@@ -62,12 +66,14 @@ export default function PointCard({ point, canManagePoint = false, onEdit }: {
             <MaterialIcon name="content_copy" />
             Zkopírovat odkaz
           </button>
-          <a
-            className="point-report"
-            href={`/nahlasit-chybu?${new URLSearchParams({ [pointLinkParam]: point.id })}`}
-          >
-            Nahlásit chybu
-          </a>
+          {!isV2 && (
+            <a
+              className="point-report"
+              href={`/nahlasit-chybu?${new URLSearchParams({ [pointLinkParam]: point.id })}`}
+            >
+              Nahlásit chybu
+            </a>
+          )}
         </div>
         {shareStatus?.copied && <span role="status">Odkaz zkopírován.</span>}
         {shareStatus && !shareStatus.copied && (
@@ -84,7 +90,7 @@ export default function PointCard({ point, canManagePoint = false, onEdit }: {
       {canManagePoint && (
         <div className="point-admin-actions">
           {onEdit && <button type="button" onClick={() => onEdit(point)}>Upravit bod</button>}
-          <HidePointForm pointId={point.id} />
+          {!isV2 && <HidePointForm pointId={point.id} />}
         </div>
       )}
     </article>

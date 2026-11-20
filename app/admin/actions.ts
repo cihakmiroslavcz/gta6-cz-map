@@ -2,8 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { mapPoints, pointLinkParam, readPointClassification, type MapPoint } from "@/components/map/map-points";
+import { mapPoints, pointLinkParam } from "@/components/map/map-points";
 import { readMapLocation } from "@/lib/map-location";
+import { readPointFields, type SavePointResult } from "@/lib/map-point-fields";
 import { isMapPointId, isSuggestionId } from "@/lib/map-point-id";
 import { createSessionClient, getMapAdminClient, isMapAdmin, readMapPoints, readPublishedPoints } from "@/lib/supabase/map-server";
 
@@ -35,20 +36,6 @@ function revalidateMap() {
   revalidatePath("/");
   revalidatePath("/admin");
   revalidatePath("/nahlasit-chybu");
-}
-
-type SavePointResult = { point: MapPoint } | { error: string } | null;
-
-function readPointFields(formData: FormData) {
-  const rawName = formData.get("name");
-  const rawDescription = formData.get("description");
-  const name = typeof rawName === "string" ? rawName.trim() : "";
-  const description = typeof rawDescription === "string" ? rawDescription.trim() : "";
-  const classification = readPointClassification(formData.get("category"), formData.get("type"));
-  if (!name || name.length > 120 || description.length > 3000 || !classification) {
-    return null;
-  }
-  return { name, description: description || null, ...classification };
 }
 
 export async function addPoint(_previous: SavePointResult, formData: FormData): Promise<SavePointResult> {

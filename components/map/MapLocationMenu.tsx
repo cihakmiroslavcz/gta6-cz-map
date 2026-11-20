@@ -4,7 +4,7 @@ import type { LatLng, LatLngTuple, LeafletKeyboardEvent, LeafletMouseEvent } fro
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { CircleMarker, Popup, useMap, useMapEvents } from "react-leaflet";
 import SuggestionForm from "@/app/navrhnout-misto/SuggestionForm";
-import { isValidMapLocation, mapLocationParams, type MapLocation } from "@/lib/map-location";
+import { isValidMapLocation, mapLocationParams, mapV2Path, type MapLocation } from "@/lib/map-location";
 import PointEditorForm from "./PointEditorForm";
 import MobileMapDialog from "./MobileMapDialog";
 import type { MapPoint } from "./map-points";
@@ -19,12 +19,13 @@ function usesMobileDialog() {
 type LocationActionsProps = {
   location: Selection;
   canManagePoints: boolean;
+  isV2: boolean;
   onPointAdded: (point: MapPoint) => void;
   onOpenMobileDialog: (dialog: MobileDialog) => void;
   onClose: () => void;
 };
 
-function LocationActions({ location, canManagePoints, onPointAdded, onOpenMobileDialog, onClose }: LocationActionsProps) {
+function LocationActions({ location, canManagePoints, isV2, onPointAdded, onOpenMobileDialog, onClose }: LocationActionsProps) {
   const map = useMap();
   const params = mapLocationParams(location);
   const position = useMemo<LatLngTuple>(() => [location.y, location.x], [location.x, location.y]);
@@ -52,7 +53,7 @@ function LocationActions({ location, canManagePoints, onPointAdded, onOpenMobile
   }
 
   async function copyLocation() {
-    const url = new URL(`/?${params}`, window.location.origin).href;
+    const url = new URL(`${isV2 ? mapV2Path : "/"}?${params}`, window.location.origin).href;
     try {
       await navigator.clipboard.writeText(url);
       setStatus({ copied: true });
@@ -83,7 +84,7 @@ function LocationActions({ location, canManagePoints, onPointAdded, onOpenMobile
               onClick={(event) => {
                 // The menu unmounts on this click. Keep Leaflet from also handling it as a map click.
                 event.stopPropagation();
-                if (usesMobileDialog()) {
+                if (isV2 || usesMobileDialog()) {
                   openMobileDialog("add");
                 } else {
                   setEditing(true);
@@ -93,18 +94,20 @@ function LocationActions({ location, canManagePoints, onPointAdded, onOpenMobile
               Přidat bod
             </button>
           )}
-          <a
-            ref={canManagePoints ? undefined : focusFirstAction}
-            href={`/navrhnout-misto?${params}`}
-            onClick={(event) => {
-              if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || !usesMobileDialog()) return;
-              event.preventDefault();
-              event.stopPropagation();
-              openMobileDialog("suggest");
-            }}
-          >
-            Navrhnout místo
-          </a>
+          {!isV2 && (
+            <a
+              ref={canManagePoints ? undefined : focusFirstAction}
+              href={`/navrhnout-misto?${params}`}
+              onClick={(event) => {
+                if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || !usesMobileDialog()) return;
+                event.preventDefault();
+                event.stopPropagation();
+                openMobileDialog("suggest");
+              }}
+            >
+              Navrhnout místo
+            </a>
+          )}
           <button type="button" onClick={copyLocation}>Zkopírovat odkaz</button>
           {status?.copied && <span role="status">Odkaz zkopírován.</span>}
           {status && !status.copied && (
@@ -119,9 +122,10 @@ function LocationActions({ location, canManagePoints, onPointAdded, onOpenMobile
   );
 }
 
-export default function MapLocationMenu({ sharedLocation, canManagePoints, onPointAdded }: {
+export default function MapLocationMenu({ sharedLocation, canManagePoints, isV2, onPointAdded }: {
   sharedLocation: MapLocation | null;
   canManagePoints: boolean;
+  isV2: boolean;
   onPointAdded: (point: MapPoint) => void;
 }) {
   const map = useMap();
@@ -195,6 +199,7 @@ export default function MapLocationMenu({ sharedLocation, canManagePoints, onPoi
           key={selection.key}
           location={selection}
           canManagePoints={canManagePoints}
+          isV2={isV2}
           onPointAdded={onPointAdded}
           onOpenMobileDialog={setMobileDialog}
           onClose={() => setSelection((current) => current?.key === selection.key ? null : current)}
@@ -208,6 +213,7 @@ export default function MapLocationMenu({ sharedLocation, canManagePoints, onPoi
           {activeDialog.kind === "add" ? (
             <PointEditorForm
               location={activeDialog.location}
+              isV2={isV2}
               inDialog
               onSaved={(point) => {
                 setMobileDialog(null);

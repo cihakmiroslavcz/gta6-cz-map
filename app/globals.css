@@ -101,6 +101,28 @@ body {
   height: auto;
 }
 
+.map-title-v2 {
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-block: var(--space-1);
+  text-align: center;
+}
+
+.map-title-v2 h1,
+.map-title-v2 p {
+  margin: 0;
+}
+
+.map-title-v2 h1 {
+  font-size: 1.125rem;
+}
+
+.map-title-v2 p {
+  color: var(--glass-muted);
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
 .game-map,
 .map-loading {
   width: 100%;
@@ -642,6 +664,12 @@ body {
 
 .point-editor-fields {
   padding: 2px;
+}
+
+.point-editor-coordinates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
 }
 
 .point-editor .point-editor-error {
