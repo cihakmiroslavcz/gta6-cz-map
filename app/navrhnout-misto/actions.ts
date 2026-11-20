@@ -1,5 +1,6 @@
 "use server";
 
+import { readPointClassification } from "@/components/map/map-points";
 import { readMapLocation } from "@/lib/map-location";
 import { createPublicClient } from "@/lib/supabase/map-server";
 
@@ -17,10 +18,17 @@ export async function submitSuggestion(_previous: SuggestionResult, formData: Fo
     return { saved: false, error: "Zkontroluj název místa a popis." };
   }
 
+  const category = formData.get("category");
+  const type = formData.get("type");
+  const classification = readPointClassification(category, type);
+  if ((category || type) && !classification) {
+    return { saved: false, error: "Vyber typ místa, který patří do zvolené kategorie." };
+  }
+
   const client = createPublicClient();
   if (!client) return { saved: false, error: "Ukládání návrhů zatím není připojené." };
 
-  const { error } = await client.from("map_suggestions").insert({ name, description, ...location });
+  const { error } = await client.from("map_suggestions").insert({ name, description, ...location, ...classification });
   if (error) {
     console.error("Could not save map_suggestions", error.code);
     return { saved: false, error: "Návrh se nepodařilo uložit. Zkus to prosím znovu." };

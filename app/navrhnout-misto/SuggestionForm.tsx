@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import styles from "@/app/map-feedback.module.css";
+import PointClassificationFields from "@/components/map/PointClassificationFields";
 import { mapLocationParams, type MapLocation } from "@/lib/map-location";
 import { submitSuggestion } from "./actions";
 
@@ -46,6 +47,7 @@ export default function SuggestionForm({ location, inDialog = false }: { locatio
             onChange={(event) => setName(event.target.value)}
           />
         </div>
+        <PointClassificationFields fieldClassName={inDialog ? undefined : styles.field} />
         <div className={styles.field}>
           <label htmlFor="suggest-description">Co na tomto místě je?</label>
           <textarea

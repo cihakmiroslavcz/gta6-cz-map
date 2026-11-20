@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
-import { isPublishedPointCategory, isPublishedPointType, mapPoints, type MapPoint } from "@/components/map/map-points";
+import { getPointClassification, mapPoints, type MapPoint } from "@/components/map/map-points";
 import { isMapPointId, isPublishedPointId, isUuid } from "@/lib/map-point-id";
 import { sessionCookieOptions, supabaseConfig } from "./config";
 
@@ -87,18 +87,16 @@ async function readPointTable(client: SupabaseClient, prefix: "A" | "S", id?: st
 
     for (const row of data) {
       const rowId = row.id;
-      if (!isUuid(rowId) || !isPublishedPointCategory(row.category) || !isPublishedPointType(row.type)) {
-        continue;
-      }
       // Keep the published Barnacle Beauties point categorized before the database migration is applied.
       const legacyBarnacleBeauties = prefix === "S" && rowId === "93f1f9c4-dbe0-45d3-a597-fe4e8959519d"
         && row.category === "city" && row.type === "service";
+      const classification = getPointClassification(legacyBarnacleBeauties ? "hairSalon" : row.type);
+      if (!isUuid(rowId) || !classification) continue;
       points.push({
         id: `${prefix}${rowId}`,
         name: row.name,
         description: row.description ?? undefined,
-        category: legacyBarnacleBeauties ? "hairdresser" : row.category,
-        type: legacyBarnacleBeauties ? "hairSalon" : row.type,
+        ...classification,
         x: Number(row.x),
         y: Number(row.y),
       });
@@ -132,7 +130,7 @@ async function readPointEdits(pointId?: string) {
   const pageSize = 1000;
   let after: string | undefined;
   do {
-    const query = client.from("map_point_edits").select("point_id,name,description,category,type").order("point_id").limit(pageSize);
+    const query = client.from("map_point_edits").select("point_id,name,description,type").order("point_id").limit(pageSize);
     if (pointId) query.eq("point_id", pointId);
     if (after) query.gt("point_id", after);
     const { data, error } = await query;
@@ -142,8 +140,13 @@ async function readPointEdits(pointId?: string) {
       return null;
     }
     for (const row of data) {
-      if (!isPublishedPointCategory(row.category) || !isPublishedPointType(row.type)) continue;
-      edits.set(row.point_id, { name: row.name, description: row.description ?? undefined, category: row.category, type: row.type });
+      const classification = getPointClassification(row.type);
+      if (!classification) continue;
+      edits.set(row.point_id, {
+        name: row.name,
+        description: row.description ?? undefined,
+        ...classification,
+      });
     }
     after = data.length === pageSize ? data.at(-1)?.point_id : undefined;
   } while (after);

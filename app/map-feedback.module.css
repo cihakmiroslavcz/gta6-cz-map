@@ -68,7 +68,8 @@
   gap: var(--space-2);
 }
 
-.field label {
+.field label,
+label.field {
   font-weight: 700;
 }
 
@@ -103,6 +104,7 @@
 }
 
 .field input,
+.field select,
 .field textarea {
   box-sizing: border-box;
   width: 100%;
@@ -114,6 +116,10 @@
   color: var(--glass-ink);
   font: inherit;
   line-height: var(--map-input-line);
+}
+
+.field select {
+  color-scheme: dark;
 }
 
 .field textarea {
@@ -143,7 +149,7 @@
   cursor: progress;
 }
 
-.panel :is(a, button, input, textarea):focus-visible {
+.panel :is(a, button, input, select, textarea):focus-visible {
   outline: 2px solid #b9ebff;
   outline-offset: var(--space-1);
 }

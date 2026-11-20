@@ -86,7 +86,7 @@ export default function DesignSystemPage() {
             <p>{countFormat.format(mapPoints.length)} bodů podle kategorie a typu</p>
             {pinGroups.map(({ category, types }) => (
               <section key={category} className={styles.pinGroup}>
-                <h4>{pointCategories[category]} · {countFormat.format(pointCategoryCounts[category])}</h4>
+                <h4>{pointCategories[category].label} · {countFormat.format(pointCategoryCounts[category])}</h4>
                 <ul className={styles.iconGrid}>
                   {types.map(([type, count]) => (
                     <li key={type}>

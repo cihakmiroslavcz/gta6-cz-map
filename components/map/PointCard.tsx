@@ -46,7 +46,7 @@ export default function PointCard({ point, canManagePoint = false, onEdit }: {
           <ul className="point-chips" aria-label="Kategorie a typ místa">
             <li className="point-chip point-chip-category" data-category={point.category}>
               <span className={`point-symbol point-${point.category}`} aria-hidden="true" />
-              {pointCategories[point.category]}
+              {pointCategories[point.category].label}
             </li>
             <li className="point-chip">{pointTypes[point.type].label}</li>
           </ul>

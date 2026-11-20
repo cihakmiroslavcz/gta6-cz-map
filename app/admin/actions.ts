@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { isPublishedPointCategory, isPublishedPointType, mapPoints, pointLinkParam, type MapPoint } from "@/components/map/map-points";
+import { mapPoints, pointLinkParam, readPointClassification, type MapPoint } from "@/components/map/map-points";
 import { readMapLocation } from "@/lib/map-location";
 import { isMapPointId, isSuggestionId } from "@/lib/map-point-id";
 import { createSessionClient, getMapAdminClient, isMapAdmin, readMapPoints, readPublishedPoints } from "@/lib/supabase/map-server";
@@ -44,13 +44,11 @@ function readPointFields(formData: FormData) {
   const rawDescription = formData.get("description");
   const name = typeof rawName === "string" ? rawName.trim() : "";
   const description = typeof rawDescription === "string" ? rawDescription.trim() : "";
-  const category = formData.get("category");
-  const type = formData.get("type");
-  if (!name || name.length > 120 || description.length > 3000 ||
-    !isPublishedPointCategory(category) || !isPublishedPointType(type)) {
+  const classification = readPointClassification(formData.get("category"), formData.get("type"));
+  if (!name || name.length > 120 || description.length > 3000 || !classification) {
     return null;
   }
-  return { name, description: description || null, category, type };
+  return { name, description: description || null, ...classification };
 }
 
 export async function addPoint(_previous: SavePointResult, formData: FormData): Promise<SavePointResult> {
@@ -155,20 +153,20 @@ export async function reviewSuggestion(_previous: string | null, formData: FormD
 
   let values: Record<string, string | number> = { suggestion_id: id, decision };
   if (decision === "approved") {
-    const rawName = formData.get("name");
-    const rawDescription = formData.get("description");
-    const name = typeof rawName === "string" ? rawName.trim() : "";
-    const description = typeof rawDescription === "string" ? rawDescription.trim() : "";
-    const category = formData.get("category");
-    const type = formData.get("type");
-    if (!name || name.length > 120 || !description || description.length > 3000 ||
-      !isPublishedPointCategory(category) || !isPublishedPointType(type)) {
+    const fields = readPointFields(formData);
+    if (!fields?.description) {
       return "Doplň platný název, popis, kategorii a typ bodu.";
     }
 
     const { data: suggestion, error } = await client.from("map_suggestions").select("x,y").eq("id", id).maybeSingle();
     if (error || !suggestion) return "Souřadnice návrhu se nepodařilo načíst.";
-    values = { ...values, name, description, category, type, x: Number(suggestion.x), y: Number(suggestion.y) };
+    values = {
+      ...values,
+      ...fields,
+      description: fields.description,
+      x: Number(suggestion.x),
+      y: Number(suggestion.y),
+    };
   }
 
   const { error } = await client.from("map_suggestion_reviews").insert(values);

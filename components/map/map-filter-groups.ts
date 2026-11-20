@@ -1,5 +1,4 @@
-import type { MaterialIconName } from "@/components/MaterialIcon";
-import type { MapPoint } from "./map-points";
+import { pointCategories, pointTypes, publishedPointCategories, type MapPoint } from "./map-points";
 
 export type MapFilterType = Exclude<MapPoint["type"], "barberShop">;
 
@@ -16,31 +15,6 @@ export function updateHiddenFilterTypes(hiddenTypes: ReadonlySet<MapFilterType>,
   return updated;
 }
 
-const groups: readonly { id: string; label: string; icon: MaterialIconName; types: readonly MapFilterType[] }[] = [
-  { id: "places", label: "Místa a příroda", icon: "map", types: [
-    "attraction", "museum", "lighthouse", "naturalSite", "park", "lake", "waterway", "mountain", "hill", "ridge", "event",
-  ] },
-  { id: "shops", label: "Obchody a podniky", icon: "storefront", types: [
-    "hairSalon", "tattoo", "clothingStore", "shoeStore", "electronicsStore", "supermarket", "liquorStore", "restaurant",
-    "pawnshop", "gunShop", "motorcycleShop", "shop",
-  ] },
-  { id: "garages", label: "Autoservisy", icon: "car_repair", types: ["autoShop"] },
-  { id: "services", label: "Služby", icon: "build", types: ["gasStation", "carWash", "pharmacy", "hotel", "service"] },
-  { id: "activities", label: "Sport a aktivity", icon: "sports_tennis", types: [
-    "racetrack", "gym", "golfCourse", "tennis", "volleyball", "stadium", "arena", "leisure",
-  ] },
-  { id: "collectibles", label: "Poklady a sběratelské předměty", icon: "sell", types: ["treasure"] },
-  { id: "nightlife", label: "Zábava a noční život", icon: "nightlife", types: [
-    "bar", "nightclub", "stripclub", "cinema", "casino", "ferrisWheel",
-  ] },
-  { id: "transport", label: "Doprava", icon: "directions_transit", types: [
-    "airport", "marina", "trainStation", "metroStation", "busStop", "parking", "bridge", "tunnel", "transit",
-  ] },
-  { id: "buildings", label: "Budovy a infrastruktura", icon: "account_balance", types: [
-    "police", "hospital", "publicBuilding", "church", "residential", "office", "industrial", "warehouse", "waterTower", "transmitter",
-  ] },
-];
-
 export function getMapFilterGroups(points: readonly Pick<MapPoint, "type">[]) {
   const counts = new Map<MapFilterType, number>();
   for (const point of points) {
@@ -48,17 +22,11 @@ export function getMapFilterGroups(points: readonly Pick<MapPoint, "type">[]) {
     counts.set(type, (counts.get(type) ?? 0) + 1);
   }
 
-  const visibleGroups = groups.flatMap(({ types, ...group }) => {
-    const rows = types.flatMap((type) => {
-      const count = counts.get(type);
-      counts.delete(type);
-      return count ? [{ type, count }] : [];
-    });
-    return rows.length ? [{ ...group, rows }] : [];
-  });
+  const rows = Array.from(counts, ([type, count]) => ({ type, count }))
+    .sort((a, b) => pointTypes[a.type].label.localeCompare(pointTypes[b.type].label, "cs"));
 
-  if (counts.size) {
-    visibleGroups.push({ id: "other", label: "Ostatní", icon: "location_on", rows: Array.from(counts, ([type, count]) => ({ type, count })) });
-  }
-  return visibleGroups;
+  return [...publishedPointCategories, "uncategorized" as const].flatMap((id) => {
+    const categoryRows = rows.filter(({ type }) => pointTypes[type].category === id);
+    return categoryRows.length ? [{ id, ...pointCategories[id], rows: categoryRows }] : [];
+  });
 }

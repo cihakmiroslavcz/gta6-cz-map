@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import Link from "next/link";
-import { pointLinkParam } from "@/components/map/map-points";
+import { getPointClassification, pointLinkParam } from "@/components/map/map-points";
 import { mapLocationParams } from "@/lib/map-location";
 import { suggestionPointId } from "@/lib/map-point-id";
 import SuggestionReviewForm from "./SuggestionReviewForm";
@@ -21,7 +21,7 @@ export default async function SuggestionList({ client, pageValue }: { client: Su
   const start = (page - 1) * pageSize;
   const { data, error } = await client
     .from("map_suggestions")
-    .select("id,name,description,x,y,zoom,created_at,review:map_suggestion_reviews(decision,name,description)")
+    .select("*,review:map_suggestion_reviews(decision,name,description)")
     .order("created_at", { ascending: false })
     .order("id", { ascending: false })
     .range(start, start + pageSize);
@@ -54,7 +54,12 @@ export default async function SuggestionList({ client, pageValue }: { client: Su
                     <p>{review?.description ?? suggestion.description}</p>
                     <a href={`/?${mapParams}`}>Zobrazit místo na mapě</a>
                     {!decision && (
-                      <SuggestionReviewForm id={suggestion.id} name={suggestion.name} description={suggestion.description} />
+                      <SuggestionReviewForm
+                        id={suggestion.id}
+                        name={suggestion.name}
+                        description={suggestion.description}
+                        classification={getPointClassification(suggestion.type)}
+                      />
                     )}
                   </li>
                 );

@@ -81,9 +81,9 @@ Pro schvalování spusť [migraci map_suggestion_reviews.sql](supabase/migration
 
 Pro přidávání bodů přímo z mapy spusť [migraci map_admin_points.sql](supabase/migrations/20261119000000_map_admin_points.sql). Po přihlášení správce klikni pravým tlačítkem na vybrané místo a zvol **Přidat bod**. Vyplň název, kategorii a typ, případně popis. Tlačítko **Přidat na mapu** bod rovnou zveřejní na vybraných souřadnicích.
 
-Pro ukládání a schvalování bodů v kategorii **Kadeřnictví** spusť [migraci map_hairdresser_category.sql](supabase/migrations/20261119000001_map_hairdresser_category.sql). Migrace zařadí do stejné kategorie také existující bod Barnacle Beauties.
-
 Pro úpravy existujících bodů spusť [migraci map_point_edits.sql](supabase/migrations/20261119000002_map_point_edits.sql). Správce pak může z detailu bodu upravit název, popis, kategorii a typ pomocí tlačítka **Upravit bod**.
+
+Pro ukládání kategorie a typu ve veřejných návrzích spusť [migraci map_point_categories.sql](supabase/migrations/20261120000000_map_point_categories.sql) a po ní [migraci map_point_taxonomy.sql](supabase/migrations/20261120000001_map_point_taxonomy.sql). Druhá migrace přeřadí uložené body a návrhy podle jejich typu do nových skupin, například **Vozidla**, **Obchody** a **Vzhled**. Všechny migrace spouštěj v pořadí podle názvu souboru, včetně mezilehlé migrace `map_hairdresser_category.sql`.
 
 ## Písmo a ikony
 
