@@ -53,7 +53,7 @@ export default function SuggestionForm({ location, inDialog = false }: { locatio
           <textarea
             id="suggest-description"
             name="description"
-            rows={inDialog ? 3 : 5}
+            rows={inDialog ? 4 : 5}
             required
             maxLength={3000}
             value={description}

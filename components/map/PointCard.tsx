@@ -53,7 +53,7 @@ export default function PointCard({ point, canManagePoint = false, isV2 = false,
             <li className="point-chip">{pointTypes[point.type].label}</li>
           </ul>
         </header>
-        {point.description && <p>{point.description}</p>}
+        {point.description && <p className="point-card-description">{point.description}</p>}
         {point.location && <p>{point.location}</p>}
         {!isV2 && (
           <p className="point-card-note">{point.unconfirmed ? "Nepotvrzené místo · Přibližná poloha" : "Přibližná poloha"}</p>

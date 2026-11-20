@@ -61,7 +61,7 @@ export default function PointEditorForm({ location, point, onSaved, inDialog = f
         )}
         <label>
           Popis (nepovinný)
-          <textarea name="description" rows={2} maxLength={3000} value={description} onChange={(event) => setDescription(event.target.value)} />
+          <textarea name="description" rows={4} maxLength={3000} value={description} onChange={(event) => setDescription(event.target.value)} />
         </label>
       </div>
       {result && "error" in result && <p className="point-editor-error" role="alert">{result.error}</p>}

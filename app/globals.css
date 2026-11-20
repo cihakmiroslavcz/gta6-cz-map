@@ -471,6 +471,11 @@ body {
   margin: 0;
 }
 
+.point-card-description {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .point-card-heading {
   display: grid;
   gap: var(--space-2);
