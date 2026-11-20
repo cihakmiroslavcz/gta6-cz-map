@@ -28,6 +28,7 @@ import MapTools from "./MapTools";
 import MobileMapDialog from "./MobileMapDialog";
 import PointCard from "./PointCard";
 import PointEditorForm from "./PointEditorForm";
+import type { MapArea } from "./map-area-search";
 import {
   baseMapStorageKey,
   readLeonidaManifest,
@@ -289,6 +290,24 @@ type PointMarkersProps = {
   onPointEdit: (point: MapPoint) => void;
 };
 
+function MapAreaView({ selection }: { selection: { area: MapArea } | null }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!selection) return;
+
+    const size = map.getSize();
+    map.closePopup();
+    map.fitBounds(selection.area.bounds, {
+      maxZoom: maxZoom - 1,
+      padding: point(Math.min(48, size.x / 8), Math.min(108, size.y / 6)),
+      animate: false,
+    });
+  }, [selection, map]);
+
+  return null;
+}
+
 function PointMarkers({ points, canManagePoints, selection, clustering, onPointEdit }: PointMarkersProps) {
   const map = useMap();
   const markers = useRef(new Map<string, LeafletMarker>());
@@ -373,13 +392,13 @@ export default function LeafletGameMap({ hiddenPointIds, points: allPoints, canM
   });
   const [hiddenTypes, setHiddenTypes] = useState<ReadonlySet<MapFilterType>>(() => new Set());
   const visiblePoints = useMemo(() => points.filter(({ type }) => !hiddenTypes.has(getMapFilterType(type))), [points, hiddenTypes]);
-  const [selection, setSelection] = useState<PointMarkersProps["selection"]>(() => {
+  const [selection, setSelection] = useState<{ point: MapPoint } | { area: MapArea } | null>(() => {
     const pointId = new URLSearchParams(window.location.search).get(pointLinkParam);
     const point = points.find(({ id }) => id === pointId);
     return point ? { point } : null;
   });
   const [initialView] = useState<MapView>(() => {
-    if (selection) return { center: [selection.point.y, selection.point.x], zoom: pointZoom };
+    if (selection && "point" in selection) return { center: [selection.point.y, selection.point.x], zoom: pointZoom };
     if (sharedLocation) return { center: [sharedLocation.y, sharedLocation.x], zoom: sharedLocation.zoom };
     return readMapView();
   });
@@ -470,6 +489,7 @@ export default function LeafletGameMap({ hiddenPointIds, points: allPoints, canM
           setHiddenTypes((previous) => updateHiddenFilterTypes(previous, types, visible))
         }
         onPointSelect={selectPoint}
+        onAreaSelect={(area) => setSelection({ area })}
         clustering={clustering}
         onClusteringChange={changeClustering}
         basemap={{
@@ -512,6 +532,7 @@ export default function LeafletGameMap({ hiddenPointIds, points: allPoints, canM
         )}
         <RememberMapView />
         <MapCoordinates />
+        <MapAreaView selection={selection && "area" in selection ? selection : null} />
         <MapLocationMenu
           sharedLocation={!selection && showLocationMarker ? sharedLocation : null}
           canManagePoints={canManagePoints}
@@ -520,7 +541,7 @@ export default function LeafletGameMap({ hiddenPointIds, points: allPoints, canM
         <PointMarkers
           points={visiblePoints}
           canManagePoints={canManagePoints}
-          selection={selection}
+          selection={selection && "point" in selection ? selection : null}
           clustering={clustering}
           onPointEdit={setEditingPoint}
         />

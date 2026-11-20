@@ -357,6 +357,20 @@ body {
   list-style: none;
 }
 
+.map-search ul + ul {
+  margin-top: var(--space-3);
+}
+
+.map-search li .map-search-area {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.map-search-area > .material-icon {
+  color: #b9ebff;
+}
+
 .map-search-empty {
   margin: 0;
   padding: var(--space-2);
