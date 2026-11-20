@@ -56,6 +56,7 @@ body {
 
 .map-screen {
   --hud-inset: var(--space-5);
+  --hud-bottom: var(--space-2);
   --hud-top: calc(var(--hud-inset) + var(--space-2));
   --hud-row: calc(var(--hud-inset) + var(--map-title-height) + var(--space-2));
   --map-title-width: 264px;
@@ -132,7 +133,7 @@ body {
 }
 
 .game-map .leaflet-control-zoom {
-  margin: 0 var(--hud-inset) var(--space-2) 0;
+  margin: 0 var(--hud-inset) var(--hud-bottom) 0;
   overflow: hidden;
   border-radius: 18px;
 }
@@ -199,7 +200,7 @@ body {
 .map-coordinates {
   position: absolute;
   z-index: 1000;
-  bottom: calc(var(--hud-inset) + var(--space-8));
+  bottom: var(--hud-bottom);
   left: var(--hud-inset);
   border-radius: 16px;
   padding: var(--space-2) var(--space-3);
