@@ -45,7 +45,7 @@ export default function FilterPreview() {
               return (
                 <li
                   key={type}
-                  className={`map-pin map-pin-${category} ${styles.pin}`}
+                  className={`map-pin map-pin-${category} map-pin-type-${type} ${styles.pin}`}
                   style={{ left, top }}
                   aria-label={`${pointCategories[category].label}, ${label}`}
                 >

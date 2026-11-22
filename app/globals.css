@@ -26,10 +26,10 @@
   --glass-base: #092541bd;
   --filter-accent: #9af3df;
   --map-switch-on: #ff42ac;
-  --map-cluster-small-fill: #485bc1;
-  --map-cluster-medium-fill: #257746;
-  --map-cluster-large-fill: #b74712;
-  --map-cluster-dense-fill: #c52f47;
+  --map-cluster-small-fill: #33455e;
+  --map-cluster-medium-fill: #293951;
+  --map-cluster-large-fill: #203047;
+  --map-cluster-dense-fill: #16283a;
   --point-action: #ff9ecd;
   --point-action-hover: #ffb7da;
   --point-action-ink: #431b34;
@@ -335,6 +335,16 @@ body {
   overflow: hidden;
 }
 
+.material-icon[data-icon="pistol"] {
+  background: currentColor;
+  text-indent: 1em;
+  clip-path: polygon(
+    8% 20%, 91% 20%, 96% 26%, 96% 42%, 63% 42%,
+    63% 54%, 55% 66%, 46% 66%, 46% 57%, 52% 56%, 55% 49%, 42% 49%,
+    31% 88%, 10% 88%, 20% 51%, 8% 51%
+  );
+}
+
 .map-search-field .material-icon {
   color: #b9ebff;
 }
@@ -476,6 +486,31 @@ body {
   overflow-wrap: anywhere;
 }
 
+.point-card-facts {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding-block: var(--space-2);
+  border-block: 1px solid var(--glass-edge);
+}
+
+.point-card-facts > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  column-gap: var(--space-2);
+}
+
+.point-card-facts dt {
+  font-weight: 700;
+}
+
+.point-card-facts dd {
+  margin: 0;
+  color: var(--glass-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 .point-card-heading {
   display: grid;
   gap: var(--space-2);
@@ -506,7 +541,6 @@ body {
   --chip-text: var(--glass-ink);
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
   padding: var(--space-1) var(--space-2);
   border: 1px solid color-mix(in srgb, var(--chip-text) 32%, transparent);
   border-radius: 12px;
@@ -517,7 +551,8 @@ body {
   font-weight: 600;
 }
 
-.point-chip-category {
+.point-chip-category,
+.point-chip[data-type="gunShop"] {
   --chip-text: var(--point-accent, var(--glass-ink));
 }
 
@@ -921,6 +956,10 @@ a.point-report:hover {
   font-size: 16px;
 }
 
+.map-filter-row[data-type="gunShop"] .map-filter-row-icon {
+  --group-accent: var(--point-accent);
+}
+
 .map-filter-chevron {
   flex: 0 0 6px;
   height: 6px;
@@ -1231,58 +1270,63 @@ a.point-report:hover {
 }
 
 :where([data-category="vehicles"], .map-pin-vehicles) {
-  --point-accent: #f8eb8c;
-  --point-fill: #756100;
+  --point-accent: #f8de74;
+  --point-fill: #766200;
 }
 
 :where([data-category="shop"], .map-pin-shop) {
-  --point-accent: #d5b8ff;
-  --point-fill: #6b39a9;
+  --point-accent: #d4b4fb;
+  --point-fill: #653b9f;
 }
 
 :where([data-category="style"], .map-pin-style) {
-  --point-accent: #ffa9d3;
-  --point-fill: #b32367;
+  --point-accent: #f9a7dc;
+  --point-fill: #973371;
 }
 
 :where([data-category="foodDrink"], .map-pin-foodDrink) {
-  --point-accent: #ffada0;
-  --point-fill: #a6382c;
+  --point-accent: #ffbb7e;
+  --point-fill: #b3560b;
 }
 
 :where([data-category="activities"], .map-pin-activities) {
-  --point-accent: #8cdfdb;
-  --point-fill: #08656b;
+  --point-accent: #81e4d8;
+  --point-fill: #006d66;
 }
 
 :where([data-category="collectibles"], .map-pin-collectibles) {
-  --point-accent: #ffd298;
-  --point-fill: #97511a;
+  --point-accent: #abb8ff;
+  --point-fill: #3344bd;
 }
 
 :where([data-category="robberies"], .map-pin-robberies) {
-  --point-accent: #ff9ca1;
-  --point-fill: #8e2232;
+  --point-accent: #83efbd;
+  --point-fill: #005f41;
 }
 
 :where([data-category="properties"], .map-pin-properties) {
-  --point-accent: #c6d6ef;
-  --point-fill: #455b75;
+  --point-accent: #e4c9a7;
+  --point-fill: #74604b;
 }
 
 :where([data-category="localPlaces"], .map-pin-localPlaces) {
-  --point-accent: #9edbff;
-  --point-fill: #096e9b;
+  --point-accent: #8ed4ff;
+  --point-fill: #0a679e;
 }
 
 :where([data-category="nature"], .map-pin-nature) {
-  --point-accent: #b6eb91;
-  --point-fill: #18784d;
+  --point-accent: #a8de9a;
+  --point-fill: #267333;
 }
 
 :where([data-category="uncategorized"], .map-pin-uncategorized) {
-  --point-accent: #d7c5ff;
-  --point-fill: #6943ac;
+  --point-accent: #d4d6dc;
+  --point-fill: #53565c;
+}
+
+:where(.map-pin-type-gunShop, .map-filter-row[data-type="gunShop"], .point-chip[data-type="gunShop"]) {
+  --point-accent: #ff9dab;
+  --point-fill: #c3223b;
 }
 
 .map-pin::before {
@@ -1295,7 +1339,7 @@ a.point-report:hover {
   height: 28px;
   border: 2px solid #fff;
   border-radius: 50% 50% 50% 0;
-  background: var(--point-fill, #096e9b);
+  background: var(--point-fill, #53565c);
   rotate: -45deg;
   box-shadow: 0 1px 5px #122438a6;
 }
@@ -1315,17 +1359,17 @@ a.point-report:hover {
 .map-treasure::before {
   width: 96px;
   height: 96px;
-  border: 2px dashed #79551a;
-  background: #d4ad572b;
-  filter: drop-shadow(0 1px 0 #fff0c7b3);
+  border: 2px dashed var(--point-fill);
+  background: color-mix(in srgb, var(--point-accent) 24%, transparent);
+  filter: drop-shadow(0 1px 0 var(--point-accent));
 }
 
 .map-treasure::after {
   width: 14px;
   height: 14px;
-  border: 1px solid #513609;
-  background: #e0af44;
-  box-shadow: 0 0 0 1px #fff0c7;
+  border: 1px solid var(--point-fill);
+  background: var(--point-accent);
+  box-shadow: 0 0 0 1px #fff;
 }
 
 .game-map .map-pin::before,
@@ -1445,30 +1489,10 @@ a.point-report:hover {
   }
 }
 
-.point-symbol {
-  display: inline-block;
-  flex: 0 0 10px;
-  width: 10px;
-  height: 10px;
-  background: var(--chip-text);
-}
-
 .map-pin .material-icon {
   position: absolute;
   top: 8px;
   left: 10px;
   font-size: 16px;
   color: #fff;
-}
-
-.point-nature {
-  clip-path: polygon(50% 0, 100% 100%, 0 100%);
-}
-
-.point-localPlaces {
-  border-radius: 50%;
-}
-
-.point-uncategorized {
-  rotate: 45deg;
 }

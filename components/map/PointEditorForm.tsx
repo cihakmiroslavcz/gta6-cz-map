@@ -40,6 +40,12 @@ export default function PointEditorForm({ location, point, onSaved, inDialog = f
           <input ref={nameInput} name="name" required maxLength={120} value={name} onChange={(event) => setName(event.target.value)} />
         </label>
         <PointClassificationFields initial={point} required />
+        {!isV2 && !point && (
+          <label>
+            Odkaz na doklad polohy ze hry
+            <input name="verificationSource" type="url" required maxLength={1000} />
+          </label>
+        )}
         {isV2 && point && (
           <div className="point-editor-coordinates">
             {(["x", "y"] as const).map((axis) => (

@@ -1,8 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
-import { getPointClassification, mapPoints, type MapPoint } from "@/components/map/map-points";
+import { getPointClassification, type MapPoint } from "@/components/map/map-points";
+import { readVerificationSource } from "@/lib/map-point-fields";
 import { isMapPointId, isPublishedPointId, isUuid } from "@/lib/map-point-id";
+import { verifiedMapPoints } from "@/lib/verified-map-points";
 import { sessionCookieOptions, supabaseConfig } from "./config";
 
 export async function createSessionClient() {
@@ -71,7 +73,8 @@ async function readPointTable(client: SupabaseClient, prefix: "A" | "S", id?: st
 
   do {
     const query = client.from(table)
-      .select(`${idSelection},name,description,category,type,x,y`)
+      .select(`${idSelection},name,description,category,type,x,y,verification_source`)
+      .not("verification_source", "is", null)
       .order(idColumn)
       .limit(pageSize);
     if (prefix === "S") query.eq("decision", "approved");
@@ -79,8 +82,8 @@ async function readPointTable(client: SupabaseClient, prefix: "A" | "S", id?: st
     if (after) query.gt(idColumn, after);
     const { data, error } = await query;
     if (error) {
-      // Keep serving the existing map until the corresponding migration is applied.
-      if (error.code === "PGRST205" || error.code === "42P01") return [];
+      // The reviewed local points can be served before these columns or tables are deployed.
+      if (["PGRST204", "PGRST205", "42P01", "42703"].includes(error.code)) return [];
       console.error(`Could not read ${table}`, error.code);
       return null;
     }
@@ -91,7 +94,8 @@ async function readPointTable(client: SupabaseClient, prefix: "A" | "S", id?: st
       const legacyBarnacleBeauties = prefix === "S" && rowId === "93f1f9c4-dbe0-45d3-a597-fe4e8959519d"
         && row.category === "city" && row.type === "service";
       const classification = getPointClassification(legacyBarnacleBeauties ? "hairSalon" : row.type);
-      if (!isUuid(rowId) || !classification) continue;
+      const verificationSource = readVerificationSource(row.verification_source);
+      if (!isUuid(rowId) || !classification || !verificationSource) continue;
       points.push({
         id: `${prefix}${rowId}`,
         name: row.name,
@@ -99,15 +103,16 @@ async function readPointTable(client: SupabaseClient, prefix: "A" | "S", id?: st
         ...classification,
         x: Number(row.x),
         y: Number(row.y),
+        verificationSource,
       });
     }
-    after = data.length === pageSize ? data.at(-1)?.id : undefined;
+    after = data.at(-1)?.id;
   } while (after);
 
   return points;
 }
 
-export async function readPublishedPoints(pointId?: string): Promise<MapPoint[] | null> {
+async function readPublishedPoints(pointId?: string): Promise<MapPoint[] | null> {
   const client = createPublicClient();
   if (!client) return [];
   if (pointId !== undefined) {
@@ -161,8 +166,12 @@ export async function readMapPoints(pointId?: string): Promise<MapPoint[] | null
   ]);
   if (!published || !edits) return null;
 
-  const points = pointId ? [...mapPoints.filter(({ id }) => id === pointId), ...published] : [...mapPoints, ...published];
-  return points.map((point) => {
+  const localPoints = pointId ? verifiedMapPoints.filter(({ id }) => id === pointId) : verifiedMapPoints;
+  const points = new Map(published.map((point) => [point.id, point]));
+  for (const point of localPoints) {
+    points.set(point.id, point);
+  }
+  return Array.from(points.values(), (point) => {
     const edit = edits.get(point.id);
     return edit ? { ...point, ...edit } : point;
   });

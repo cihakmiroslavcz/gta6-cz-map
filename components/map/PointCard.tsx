@@ -6,6 +6,12 @@ import MaterialIcon from "@/components/MaterialIcon";
 import { mapV2Path } from "@/lib/map-location";
 import { pointCategories, pointLinkParam, pointTypes, type MapPoint } from "./map-points";
 
+const dollarFormat = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  maximumFractionDigits: 0,
+});
+
 function HidePointForm({ pointId }: { pointId: string }) {
   const [error, action, pending] = useActionState(hidePoint, null);
 
@@ -27,6 +33,7 @@ export default function PointCard({ point, canManagePoint = false, isV2 = false,
   const [shareStatus, setShareStatus] = useState<
     { copied: true } | { copied: false; link: string } | null
   >(null);
+  const robbery = point.category === "robberies" ? point.robbery : undefined;
 
   async function copyLink() {
     const url = new URL(isV2 ? mapV2Path : "/", window.location.origin);
@@ -47,16 +54,31 @@ export default function PointCard({ point, canManagePoint = false, isV2 = false,
           <h2>{point.name}</h2>
           <ul className="point-chips" aria-label="Kategorie a typ místa">
             <li className="point-chip point-chip-category" data-category={point.category}>
-              <span className={`point-symbol point-${point.category}`} aria-hidden="true" />
               {pointCategories[point.category].label}
             </li>
-            <li className="point-chip">{pointTypes[point.type].label}</li>
+            <li className="point-chip" data-type={point.type}>{pointTypes[point.type].label}</li>
           </ul>
         </header>
         {point.description && <p className="point-card-description">{point.description}</p>}
         {point.location && <p>{point.location}</p>}
-        {!isV2 && (
-          <p className="point-card-note">{point.unconfirmed ? "Nepotvrzené místo · Přibližná poloha" : "Přibližná poloha"}</p>
+        {robbery && (
+          <dl className="point-card-facts">
+            {robbery.security && (
+              <div>
+                <dt>Zabezpečení</dt>
+                <dd>{robbery.security}</dd>
+              </div>
+            )}
+            {robbery.take && (
+              <div>
+                <dt>Možná kořist</dt>
+                <dd>{dollarFormat.format(robbery.take.min)} – {dollarFormat.format(robbery.take.max)}</dd>
+              </div>
+            )}
+          </dl>
+        )}
+        {point.verificationSource && (
+          <p className="point-card-note">Ověřeno ve hře · Přibližná poloha</p>
         )}
       </div>
 

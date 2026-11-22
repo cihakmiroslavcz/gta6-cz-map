@@ -35,10 +35,14 @@ export default function SuggestionReviewForm({
           <textarea name="description" required maxLength={3000} rows={4} value={details} onChange={(event) => setDetails(event.target.value)} />
         </label>
         <PointClassificationFields initial={classification ?? undefined} required />
+        <label>
+          Odkaz na doklad polohy ze hry
+          <input name="verificationSource" type="url" required maxLength={1000} />
+        </label>
         {error && <p role="alert">{error}</p>}
         <div className={styles.toolbar}>
           <button type="submit" name="decision" value="approved" className={styles.primary} disabled={pending}>
-            Schválit a přidat na mapu
+            Potvrdit polohu a přidat na mapu
           </button>
           <button type="submit" name="decision" value="rejected" className={styles.control} disabled={pending} formNoValidate>
             Zamítnout
