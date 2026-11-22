@@ -69,7 +69,7 @@ export const pointTypes = {
   pharmacy: { category: "shop", icon: "local_pharmacy", label: "Lékárna", aliases: ["lékárny", "pharmacy"] },
   hairSalon: { category: "style", icon: "content_cut", label: "Kadeřnický salon", aliases: ["kadeřnictví", "kadeřnice", "kadeřník", "hairdresser", "hair salon"] },
   barberShop: { category: "style", icon: "content_cut", label: "Barbershop", aliases: ["barber shop", "barber", "holič", "holičství", "pánské kadeřnictví"] },
-  gunShop: { category: "shop", icon: "target", label: "Obchod se zbraněmi", aliases: ["zbraně", "ammu nation", "prodejna"] },
+  gunShop: { category: "shop", icon: "pistol", label: "Obchod se zbraněmi", aliases: ["zbraně", "ammu nation", "prodejna"] },
   naturalSite: { category: "nature", icon: "landscape", label: "Přírodní místo", aliases: ["příroda", "natural"] },
   attraction: { category: "localPlaces", icon: "star", label: "Pamětihodnost", aliases: ["zajímavost", "památka", "monument"] },
   treasure: { category: "collectibles", icon: "sell", label: "Poklad", aliases: ["poklady", "peníze", "hotovost", "skrýš", "money", "cash", "treasure"] },
@@ -155,6 +155,11 @@ export type MapPoint = {
   description?: string;
   location?: string;
   unconfirmed?: boolean;
+  verificationSource?: string;
+  robbery?: {
+    security?: string;
+    take?: { min: number; max: number };
+  };
   category: PointCategory;
   type: keyof typeof pointTypes;
   x: number;

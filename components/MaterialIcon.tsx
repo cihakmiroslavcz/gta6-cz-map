@@ -68,7 +68,8 @@ export const materialIcons = [
   { name: "cell_tower", label: "Vysílač" },
   { name: "church", label: "Kostel" },
   { name: "attractions", label: "Vyhlídkové kolo" },
-  { name: "target", label: "Obchod se zbraněmi" },
+  { name: "pistol", label: "Obchod se zbraněmi" },
+  { name: "target", label: "Střelnice" },
   { name: "directions_car", label: "Vozidla" },
   { name: "ev_station", label: "Nabíjecí stanice" },
   { name: "format_paint", label: "Pay ’n’ Spray" },
@@ -107,5 +108,5 @@ export const materialIcons = [
 export type MaterialIconName = typeof materialIcons[number]["name"];
 
 export default function MaterialIcon({ name }: { name: MaterialIconName }) {
-  return <span className="material-icon" aria-hidden="true">{name}</span>;
+  return <span className="material-icon" data-icon={name} aria-hidden="true">{name}</span>;
 }

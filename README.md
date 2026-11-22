@@ -45,7 +45,13 @@ Každý běh připraví původní rozlišení a případné varianty uvedené v 
 
 ## Body zájmu a legenda
 
-Mapa používá výběr z [dat GTADB pro GTA VI](https://github.com/rolux/gtadb.org/blob/70e2361356/map/data/6/landmarks.json) v souboru `components/map/gtadb-points.json`. Výběr zahrnuje pojmenovaná místa včetně aktualizace z 19. listopadu 2026 a pět nepotvrzených kadeřnictví. Souřadnice jsou zaokrouhlené na desetiny metru, značky mají české kategorie odvozené ze zdrojových štítků a ručně upravená místa jsou v `components/map/map-points.ts`. Data vytvořili gtadb.org a přispěvatelé pod licencí [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Česká legenda používá výřezy symbolů z původní legendy Yanis V18.
+Veřejná mapa zobrazuje body s doloženou polohou ve hře. Výchozí výběr a odkazy na doklady jsou v [`lib/verified-map-points.ts`](lib/verified-map-points.ts). Další body přidává správce přímo na mapě nebo schválením návrhu s dokladem polohy. Značky na podkladu mají přibližnou polohu.
+
+[`lib/verified-notebook-points.json`](lib/verified-notebook-points.json) obsahuje výběr z [otevřených dat Leonida Notebook](https://leonidanotebook.com/data/map.json) z 22. listopadu 2026. Každý záznam má ověřený záběr a změřenou pozici ve snímcích herní mapy z Xbox Series S. Normalizované polohy jsou převedené do souřadnic české mapy podle pěti společných míst s [GTA6 GPS](https://gta6gps.com/). U dalších 97 shodných míst se převod od souřadnic GTA6 GPS typicky lišil o 13 metrů. Zdroj každého záznamu odkazuje na konkrétní místo v průvodci Leonida Notebook.
+
+[`lib/verified-guide-points.json`](lib/verified-guide-points.json) obsahuje souřadnice z [GTA6 GPS](https://gta6gps.com/) spárované s jednotlivými snímky herní mapy od PowerPyx. Výběr zahrnuje [banky](https://www.powerpyx.com/gta-6-all-bank-jobs-locations-bank-vaults/), [provozovny krátkodobých půjček](https://www.powerpyx.com/gta-6-all-payday-loans-jobs-locations/), [přepadení výloh](https://www.powerpyx.com/gta-6-all-smash-n-grabs-locations/), [gangové úkryty](https://www.powerpyx.com/gta-6-all-illegal-gang-operations-locations/), [minigolf](https://www.powerpyx.com/gta-6-all-golf-course-locations/) a [kaskadérské skoky](https://www.powerpyx.com/gta-6-all-stunt-jump-locations/). Karty loupeží zobrazují doloženou úroveň zabezpečení, rozmezí možné kořisti nebo popis z herní mapy.
+
+Soubor `components/map/gtadb-points.json` obsahuje pracovní seznam z [dat GTADB pro GTA VI](https://github.com/rolux/gtadb.org/blob/70e2361356/map/data/6/landmarks.json). Data vytvořili gtadb.org a přispěvatelé pod licencí [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Souřadnice GTADB jsou zaokrouhlené na desetiny metru. Česká legenda používá výřezy symbolů z původní legendy Yanis V18.
 
 Obecné názvy bodů se překládají podle seznamu `genericPointNames` v `components/map/map-points.ts` při shodě celého názvu. Vlastní jména, názvy podniků a značky zůstávají ve zdrojovém znění. Přeložený bod lze najít i podle původního názvu.
 
@@ -77,13 +83,15 @@ Tabulka skrytých bodů ukládá jen jejich ID. Databázové zásady umožňují
 
 Pro ukládání návrhů míst spusť také [migraci map_suggestions.sql](supabase/migrations/20261118000001_map_suggestions.sql). Veřejný formulář může návrh vložit a uložené návrhy smí číst pouze správce.
 
-Pro schvalování spusť [migraci map_suggestion_reviews.sql](supabase/migrations/20261118000002_map_suggestion_reviews.sql). Na `/admin` otevři **Posoudit návrh**, uprav veřejný název a popis, vyber kategorii a typ a zvol **Schválit a přidat na mapu**. Zveřejněný pin má vlastní odkaz a lze jej skrýt nebo obnovit stejně jako body GTADB.
+Pro schvalování spusť [migraci map_suggestion_reviews.sql](supabase/migrations/20261118000002_map_suggestion_reviews.sql). Na `/admin` otevři **Posoudit návrh**, uprav veřejný název a popis, vyber kategorii a typ, přilož odkaz na doklad a zvol **Potvrdit polohu a přidat na mapu**. Zveřejněný pin má vlastní odkaz a lze jej skrýt nebo obnovit stejně jako body GTADB.
 
-Pro přidávání bodů přímo z mapy spusť [migraci map_admin_points.sql](supabase/migrations/20261119000000_map_admin_points.sql). Po přihlášení správce klikni pravým tlačítkem na vybrané místo a zvol **Přidat bod**. Vyplň název, kategorii a typ, případně popis. Tlačítko **Přidat na mapu** bod rovnou zveřejní na vybraných souřadnicích.
+Pro přidávání bodů přímo z mapy spusť [migraci map_admin_points.sql](supabase/migrations/20261119000000_map_admin_points.sql). Po přihlášení správce klikni pravým tlačítkem na vybrané místo a zvol **Přidat bod**. Vyplň název, kategorii, typ a odkaz na doklad polohy, případně popis. Tlačítko **Přidat na mapu** bod zveřejní na vybraných souřadnicích.
 
 Pro úpravy existujících bodů spusť [migraci map_point_edits.sql](supabase/migrations/20261119000002_map_point_edits.sql). Správce pak může z detailu bodu upravit název, popis, kategorii a typ pomocí tlačítka **Upravit bod**.
 
 Pro ukládání kategorie a typu ve veřejných návrzích spusť [migraci map_point_categories.sql](supabase/migrations/20261120000000_map_point_categories.sql) a po ní [migraci map_point_taxonomy.sql](supabase/migrations/20261120000001_map_point_taxonomy.sql). Druhá migrace přeřadí uložené body a návrhy podle jejich typu do nových skupin, například **Vozidla**, **Obchody** a **Vzhled**. Všechny migrace spouštěj v pořadí podle názvu souboru, včetně mezilehlé migrace `map_hairdresser_category.sql`.
+
+Pro ukládání dokladu polohy spusť [migraci map_point_verification.sql](supabase/migrations/20261122000000_map_point_verification.sql). Starší databázový bod lze zveřejnit doplněním `verification_source` po ověření polohy.
 
 ## Soukromá mapa V2
 

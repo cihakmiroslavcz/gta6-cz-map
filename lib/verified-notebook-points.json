@@ -1,0 +1,226 @@
+[
+  {
+    "kind": "gas-stations",
+    "type": "gasStation",
+    "points": [
+      {"id":"Aef794401-0d04-540c-abaa-baa85c70c5ec","sourceId":"gas-stations-247-gas-key-lento","name":"24/7 Gas (Key Lento)","x":-2014,"y":-5349,"location":"Key Lento"},
+      {"id":"A689b9266-506b-547b-9577-f2df55b554bb","sourceId":"gas-stations-247-gas-millport","name":"24/7 Gas (Millport)","x":-1404,"y":6359,"location":"Millport Basin"},
+      {"id":"A758b18fa-47e7-5282-b201-72ecdf0fb3ed","sourceId":"gas-stations-arrow-gas-hamlet","name":"Arrow Gas (Hamlet)","x":-2347,"y":-3488,"location":"Hamlet"},
+      {"id":"Ab98aa99e-65c7-52b5-88a5-0b118dab5e8a","sourceId":"gas-stations-globe-oil-gas-hamlet","name":"Globe Oil Gas (Hamlet)","x":-2809,"y":-3427,"location":"Hamlet"},
+      {"id":"A6a21e80f-3e73-5966-b6f5-7a204d81a921","sourceId":"gas-stations-ltd-gas-hamlet","name":"LTD Gas (Hamlet)","x":-2582,"y":-3042,"location":"Hamlet"},
+      {"id":"Affb8dd63-d589-5b7d-94b1-fac4c611a8f5","sourceId":"gas-stations-ron-gas-balsero","name":"Ron Gas (Balsero)","x":-2746,"y":935,"location":"Balsero"},
+      {"id":"Ac92b86d4-59ec-5dc6-9b71-8572f3772a0a","sourceId":"gas-stations-ron-gas-salton","name":"Ron Gas (Salton)","x":-1996,"y":191,"location":"Salton"},
+      {"id":"Ab7d69280-c97e-54c0-9a68-77505fd480bc","sourceId":"gas-stations-xero-gas-grassrivers","name":"Xero Gas (Grassrivers)","x":-4085,"y":-2362,"location":"Pelican River"},
+      {"id":"A9727cd6d-f013-5741-a51a-8d78edec5f48","sourceId":"gas-stations-xero-gas-hamlet","name":"Xero Gas (Hamlet)","x":-3258,"y":-2958,"location":"Hamlet"},
+      {"id":"A55b2cbfb-593e-5f49-84da-9fb3b6d73395","sourceId":"gas-stations-xero-gas-la-perle","name":"Xero Gas (La Perle)","x":-646,"y":1912,"location":"La Perle"},
+      {"id":"Ab422ba62-d53f-5635-b15d-a547dd02ad28","sourceId":"gas-stations-xero-gas-millport","name":"Xero Gas (Millport)","x":-1296,"y":6368,"location":"Millport Basin"},
+      {"id":"Ac3b10571-d5f8-59c9-918e-43b0c4907eae","sourceId":"gas-stations-xero-gas-salton","name":"Xero Gas (Salton)","x":-1555,"y":-42,"location":"Salton"},
+      {"id":"Aa197802b-9ab2-5fa3-a22e-ef223311c4fc","sourceId":"gas-stations-xero-gas-southwind","name":"Xero Gas (Southwind)","x":-6393,"y":-6393,"location":"Southwind"},
+      {"id":"A4d4ade06-fe2f-57d1-89f8-96dd4bca02fa","sourceId":"gas-stations-xero-gas-tequesta","name":"Xero Gas (Tequesta)","x":-1079,"y":-883,"location":"Tequesta"},
+      {"id":"Aaa7382fd-b19e-5c10-9608-9cf16076f025","sourceId":"gas-stations-xero-gas-waning-sands","name":"Xero Gas (Waning Sands)","x":162,"y":4032,"location":"Waning Sands"}
+    ]
+  },
+  {
+    "kind": "pay-n-sprays",
+    "type": "payNSpray",
+    "points": [
+      {"id":"A543422d4-c709-56aa-a791-1ecab715d638","sourceId":"pay-n-sprays-pay-n-spray-key-lento","name":"Pay 'n' Spray (Key Lento)","x":-2482,"y":-6048,"location":"Key Lento"},
+      {"id":"A00c75669-9d09-561d-bf60-4dfce5c83516","sourceId":"pay-n-sprays-pay-n-spray-southwind","name":"Pay 'n' Spray (Southwind)","x":-6430,"y":-6286,"location":"Southwind"},
+      {"id":"Aaa13d286-61b3-5352-bf43-187a449afd2a","sourceId":"pay-n-sprays-pay-n-spray-waning-sands","name":"Pay 'n' Spray (Waning Sands)","x":316,"y":3763,"location":"Waning Sands"}
+    ]
+  },
+  {
+    "kind": "car-washes",
+    "type": "carWash",
+    "points": [
+      {"id":"A907d7205-d404-5966-8222-9c20d9c1fd00","sourceId":"car-washes-ron-car-wash-balsero","name":"Ron Car Wash (Balsero)","x":-2038,"y":1149,"location":"Balsero"},
+      {"id":"Ac6882ddb-0016-50f2-bd91-2b0ec3fc2efe","sourceId":"car-washes-ron-car-wash-salton","name":"Ron Car Wash (Salton)","x":-1985,"y":198,"location":"Salton"},
+      {"id":"A2e24b156-104f-5bd0-a95f-01b1ebdcbb58","sourceId":"car-washes-xero-car-wash-la-perle","name":"Xero Car Wash (La Perle)","x":-596,"y":1888,"location":"La Perle"}
+    ]
+  },
+  {
+    "kind": "footwear",
+    "type": "shoeStore",
+    "points": [
+      {"id":"A96c73b34-83b6-5f39-8eac-de910f4c3227","sourceId":"footwear-flip-flop-house","name":"Flip Flop House","x":-2426,"y":-5894,"location":"Key Lento"}
+    ]
+  },
+  {
+    "kind": "street-food",
+    "type": "streetFood",
+    "points": [
+      {"id":"A9e09d4e9-a266-526a-bf19-c0926313f1aa","sourceId":"street-food-antonio-produce","name":"Antonio Produce","x":-2759,"y":780,"location":"Balsero"},
+      {"id":"Aaf5b7114-745c-5fbd-9b44-64a941f05326","sourceId":"street-food-cashs-crawfish","name":"Cash's Crawfish","x":-5192,"y":-3227,"location":"Watson Bay"},
+      {"id":"A486cec25-32bd-56e4-bcdd-d458f3103c50","sourceId":"street-food-chichas-cuban-cafe","name":"Chicha's Cuban Cafe","x":-2878,"y":778,"location":"Balsero"},
+      {"id":"Aa54a8e0a-fde8-55eb-95bd-b546dbfda4d0","sourceId":"street-food-chihuahua-hotdogs-balsero","name":"Chihuahua Hotdogs (Balsero)","x":-2833,"y":714,"location":"Balsero"},
+      {"id":"Ac513c21e-ba3e-5327-842b-5a116dd740ac","sourceId":"street-food-chihuahua-hotdogs-grassrivers","name":"Chihuahua Hotdogs (Grassrivers)","x":-3551,"y":-2985,"location":"Pelican River"},
+      {"id":"A2bee8449-13d6-58fe-9c03-0d5a6574e28f","sourceId":"street-food-chumbox-seafood","name":"Chumbox Seafood","x":-2270,"y":-3472,"location":"Hamlet"},
+      {"id":"A18b978b1-e892-5c49-94ae-e080285a0dec","sourceId":"street-food-codys-famous-fresh-road-grill-ambrosia","name":"Cody's Famous Fresh Road Grill (Ambrosia)","x":-2323,"y":3808,"location":"Ambrosia"},
+      {"id":"Af57cd0d5-df5b-5d2a-a5e0-01e5fc4b1b66","sourceId":"street-food-d-j-brew-coffee","name":"Deja Brew Coffee","x":-2648,"y":-4658,"location":"Gambit Bay"},
+      {"id":"Adff41677-5e7a-58a8-b472-a7a724490cd5","sourceId":"street-food-elenas-fruit-market","name":"Elena's Fruit Market","x":-2878,"y":766,"location":"Balsero"},
+      {"id":"A6d200b30-fc8c-5f16-ace0-d40e64e026e8","sourceId":"street-food-flea-market-bbq-stand","name":"Flea Market BBQ Stand","x":-2796,"y":709,"location":"Balsero"},
+      {"id":"Aef7813dd-cb51-5bca-a690-c068b721b171","sourceId":"street-food-flea-market-fruit-stalls","name":"Flea Market Fruit Stalls","x":-2754,"y":747,"location":"Balsero"},
+      {"id":"Ab183133c-16ba-5994-92ac-15b14d5a87ee","sourceId":"street-food-hernandez-produce","name":"Hernandez Produce","x":-2880,"y":837,"location":"Balsero"},
+      {"id":"A1d341780-41ec-5352-811e-8b4a779a0530","sourceId":"street-food-jamerican-roots","name":"J'American Roots","x":-2843,"y":711,"location":"Balsero"},
+      {"id":"A7de52942-ab77-5726-a68b-288bb3bf802c","sourceId":"street-food-kiosk","name":"Kiosk","x":-2624,"y":-4672,"location":"Gambit Bay"},
+      {"id":"A31096ada-0667-5fa1-a76a-501918b7b2b7","sourceId":"street-food-mamma-bs-homemade-wine","name":"Mamma B's Homemade Wine","x":-2321,"y":3823,"location":"Leonard County"},
+      {"id":"A79b1e940-0b59-56e7-878d-cc09e70f740c","sourceId":"street-food-marshland-burger-shack","name":"Marshland Burger Shack","x":-3586,"y":-2904,"location":"Pelican River"},
+      {"id":"A3879f5ea-2f2c-573c-b223-7e4cb126dd5b","sourceId":"street-food-snappys-meat-shack","name":"Snappy's Meat Shack","x":-3575,"y":-2821,"location":"Pelican River"},
+      {"id":"Aba20a26f-f3d2-5612-8efd-2827effc8c68","sourceId":"street-food-the-salty-nut-shack","name":"The Salty Nut Shack","x":-2326,"y":3804,"location":"Leonard County"},
+      {"id":"Ae538d282-803b-5ebe-bfd3-983d4b1b38b5","sourceId":"street-food-tisha-wocka-soul-food","name":"Tisha-Wocka Soul Food","x":-2770,"y":707,"location":"Balsero"},
+      {"id":"A2fad1588-8cdc-590b-b41b-87d6b25e8baf","sourceId":"street-food-volcano-coffee-co-salton","name":"Volcano Coffee Co. (Salton)","x":-1512,"y":-182,"location":"Salton"}
+    ]
+  },
+  {
+    "kind": "electric-chargers",
+    "type": "evCharger",
+    "points": [
+      {"id":"A3056ac40-811c-5a01-867e-984181d0e16b","sourceId":"electric-chargers-electric-vehicle-charger","name":"Electric Vehicle Charger","x":-2463,"y":-5680,"location":"Key Lento"}
+    ]
+  },
+  {
+    "kind": "bus-stops",
+    "type": "busStop",
+    "points": [
+      {"id":"A21aa33bb-a9b8-5569-a14a-7ad6f01105ff","sourceId":"bus-stops-catalan-blvd-a","name":"Catalan Blvd — A","x":-612,"y":-826,"location":"Tequesta"},
+      {"id":"Aacac4b9a-f135-5b12-85f1-162cd2a0a268","sourceId":"bus-stops-catalan-blvd-b","name":"Catalan Blvd — B","x":-612,"y":-812,"location":"Tequesta"},
+      {"id":"A8d46c44e-05db-58ac-80b1-2374439c4881","sourceId":"bus-stops-cicada-ave-a","name":"Cicada Ave — A","x":-2421,"y":-2676,"location":"Hamlet"},
+      {"id":"A7b296baf-cbde-5f79-9a5c-b46c2f032b40","sourceId":"bus-stops-coral-ave-a","name":"Coral Ave — A","x":-540,"y":1886,"location":"Vice-Dale County"},
+      {"id":"A87be62b1-e9de-5937-a4b3-0ed6ed5e01ad","sourceId":"bus-stops-del-rio-blvd-l","name":"Del Rio Blvd — L","x":-839,"y":1781,"location":"Vice-Dale County"},
+      {"id":"A0bc99d07-9093-5f19-afb6-c2d6de6a0a44","sourceId":"bus-stops-del-rio-blvd-m","name":"Del Rio Blvd — M","x":-738,"y":1831,"location":"Vice-Dale County"},
+      {"id":"A2a36c1bb-7ecf-56ee-a940-fa85c3b4ac75","sourceId":"bus-stops-i-97-a","name":"I-97 — A","x":-1494,"y":-2200,"location":"Peacock Bay"},
+      {"id":"A666af31f-5e91-5f8a-98d7-2de5d14f16d3","sourceId":"bus-stops-ne-14th-st","name":"NE 14th St","x":-617,"y":1722,"location":"Vice-Dale County"},
+      {"id":"Ac7cd9184-0277-5564-916f-6dca2d484f0e","sourceId":"bus-stops-nw-13th-st","name":"NW 13th St","x":-712,"y":1719,"location":"Vice-Dale County"},
+      {"id":"A714337cc-2fc0-5157-9a53-87e2b6a1bdc3","sourceId":"bus-stops-nw-15th-ave-a","name":"NW 15th Ave — A","x":-2365,"y":443,"location":"Balsero"},
+      {"id":"Aff0d1fa5-eb37-574e-9b2d-74dd0d7ad0ed","sourceId":"bus-stops-nw-16th-ave-a","name":"NW 16th Ave — A","x":-1494,"y":-144,"location":"Vice-Dale County"},
+      {"id":"A9b2701e8-e47d-5a1e-89c3-0856498f36ab","sourceId":"bus-stops-nw-16th-ave-b","name":"NW 16th Ave — B","x":-1496,"y":-132,"location":"Vice-Dale County"},
+      {"id":"A00483bdf-2c5d-5633-a947-0ac833da582b","sourceId":"bus-stops-nw-16th-ave-c","name":"NW 16th Ave — C","x":-1430,"y":-187,"location":"Vice-Dale County"},
+      {"id":"A0f4f76fb-2ffb-5e13-b84c-e0924cd89bbd","sourceId":"bus-stops-nw-17th-st-c","name":"NW 17th St — C","x":-1655,"y":426,"location":"Vice-Dale County"},
+      {"id":"A88b12a52-f729-5df9-912d-b9793722122f","sourceId":"bus-stops-nw-17th-st-d","name":"NW 17th St — D","x":-1565,"y":450,"location":"Vice-Dale County"},
+      {"id":"A6610237d-82b4-5da3-8121-e65e945acbd3","sourceId":"bus-stops-nw-18th-ave-a","name":"NW 18th Ave — A","x":-1481,"y":-322,"location":"Salton"},
+      {"id":"Ac6653082-5a16-55bf-9904-a7d788b2c2c8","sourceId":"bus-stops-nw-19th-st-a","name":"NW 19th St — A","x":-1742,"y":29,"location":"Vice-Dale County"},
+      {"id":"A6972b85d-a6ec-5ab8-95ef-987258921098","sourceId":"bus-stops-nw-19th-st-b","name":"NW 19th St — B","x":-1713,"y":51,"location":"Vice-Dale County"},
+      {"id":"A7a4c0354-0941-5e9c-b7ae-755d93bd87cc","sourceId":"bus-stops-ocean-sound-rd-a","name":"Ocean Sound Rd — A","x":-1959,"y":-5376,"location":"Gambit Bay"},
+      {"id":"Ac017443b-fa77-58dd-81b8-de5092270caa","sourceId":"bus-stops-palmetto-ave-a","name":"Palmetto Ave - A","x":-2680,"y":-3496,"location":"Hamlet"},
+      {"id":"A1465c147-d090-5b9e-8911-b1a7f97b7fd3","sourceId":"bus-stops-palmetto-ave-b","name":"Palmetto Ave — B","x":-2685,"y":-3484,"location":"Hamlet"},
+      {"id":"A92c222f2-b5cf-54dc-9791-943cfea5d98b","sourceId":"bus-stops-queen-palm-ave","name":"Queen Palm Ave","x":-6370,"y":-6395,"location":"Mariana County"},
+      {"id":"A92dc7978-2853-5be4-81ad-8e06cf7ee666","sourceId":"bus-stops-south-vice-ave-h","name":"South Vice Ave — H","x":-773,"y":-826,"location":"Vice-Dale County"},
+      {"id":"A0be6c6d2-3301-5f11-87c6-5db0e0bdae01","sourceId":"bus-stops-south-vice-ave-i","name":"South Vice Ave — I","x":-749,"y":-822,"location":"Vice-Dale County"},
+      {"id":"Aa6658f39-0124-5b8f-acf2-5dfacf67cce6","sourceId":"bus-stops-sr-25-a","name":"SR-25 — A","x":-2719,"y":849,"location":"Balsero"},
+      {"id":"A9afd7a6d-5e1c-5229-9cea-a4b5760aa655","sourceId":"bus-stops-sr-25-c","name":"SR-25 — C","x":-1668,"y":-28,"location":"Vice-Dale County"},
+      {"id":"Abc5c0a48-2b85-574d-bbfa-b36fa2c6e5e0","sourceId":"bus-stops-sunbelt-hwy-b","name":"Sunbelt Hwy - B","x":-2078,"y":-5504,"location":"Gambit Bay"},
+      {"id":"Ae7813620-e731-5f67-afb5-2ea8c2540a1a","sourceId":"bus-stops-sunbelt-hwy-a","name":"Sunbelt Hwy — A","x":-3042,"y":-6528,"location":"Key Lento"},
+      {"id":"Af026b161-6219-55cb-8ff4-b71bfc3de537","sourceId":"bus-stops-sw-3rd-ave-d","name":"SW 3rd Ave — D","x":-1391,"y":-2233,"location":"Peacock Bay"},
+      {"id":"A06ef3199-6248-5ac5-9545-41588e4ca9b4","sourceId":"bus-stops-sw-3rd-st-a","name":"SW 3rd St — A","x":-913,"y":-886,"location":"Vice-Dale County"},
+      {"id":"Ae6b59a63-8fec-59f5-aa90-75e33bb6fe03","sourceId":"bus-stops-sw-5th-ave-a","name":"SW 5th Ave — A","x":-1428,"y":-2039,"location":"Peacock Bay"},
+      {"id":"A010ee810-4111-5767-99ef-c9105279c4b9","sourceId":"bus-stops-sw-5th-ave-b","name":"SW 5th Ave — B","x":-1298,"y":-1768,"location":"Peacock Bay"},
+      {"id":"A9e95500b-5505-5753-9bcf-23ae7e8999d2","sourceId":"bus-stops-us-628-c","name":"US-628 - C","x":-1473,"y":6380,"location":"Millport Basin"},
+      {"id":"A02796c8d-6c6c-59b8-96d6-7c7ab4add200","sourceId":"bus-stops-us-82-a","name":"US-82 - A","x":-4428,"y":-1974,"location":"Watson Bay"},
+      {"id":"A048bcc86-6e83-551b-93bb-e9b180add30f","sourceId":"bus-stops-west-royale-st-c","name":"West Royale St — C","x":-1499,"y":-368,"location":"Salton"},
+      {"id":"A94cf1952-9a1a-514b-b2a1-c3e3f1b698e5","sourceId":"bus-stops-west-royale-st-d","name":"West Royale St — D","x":-1475,"y":-377,"location":"Vice-Dale County"},
+      {"id":"A19ee680e-5246-5957-bcfd-7759b64b573e","sourceId":"bus-stops-westbrook-dr-e","name":"Westbrook Dr — E","x":-1256,"y":-427,"location":"Vice-Dale County"},
+      {"id":"A999d0109-d02f-5c93-b819-f6e3c23e8ab0","sourceId":"bus-stops-westbrook-dr-f","name":"Westbrook Dr — F","x":-1375,"y":-258,"location":"Vice-Dale County"},
+      {"id":"A4f9c7444-9c8e-53e0-bae0-8221ce635eb0","sourceId":"bus-stops-westbrook-dr-h","name":"Westbrook Dr — H","x":-1496,"y":65,"location":"Vice-Dale County"}
+    ]
+  },
+  {
+    "kind": "electronics",
+    "type": "electronicsStore",
+    "points": [
+      {"id":"Aa8039f7f-e76c-510b-9d53-6deddef57c8b","sourceId":"electronics-zekes-gadgets","name":"Zeke's Gadgets","x":-2590,"y":-3156,"location":"Hamlet"}
+    ]
+  },
+  {
+    "kind": "mod-shops",
+    "type": "modShop",
+    "points": [
+      {"id":"A3f3100eb-8aa6-5d1f-a23c-7c11e3b95c8a","sourceId":"mod-shops-coastal-auto-care","name":"Coastal Auto Care","x":-3089,"y":-6612,"location":"Key Lento"},
+      {"id":"Aff742fee-066f-5636-92a8-666812877a53","sourceId":"mod-shops-vice-auto-customs","name":"Vice Auto Customs","x":-1607,"y":386,"location":"Salton"}
+    ]
+  },
+  {
+    "kind": "ammu-nation-everyday",
+    "type": "gunShop",
+    "points": [
+      {"id":"Ac293b28e-d34f-51d8-9ba6-cd4fe1dada4e","sourceId":"ammu-nation-everyday-barrage-gun-supply","name":"Barrage Gun Supply","x":-6420,"y":-6336,"location":"Mariana County"},
+      {"id":"Aabbfdf1b-c54f-5a6d-84cc-f5ebfad946ce","sourceId":"ammu-nation-everyday-chucks-tackle-shot","name":"Chuck's Tackle & Shot","x":-2136,"y":-5521,"location":"Gambit Bay"},
+      {"id":"A8f6e87d0-9587-55ff-ba02-267679799723","sourceId":"ammu-nation-everyday-jackson-firearms","name":"Jackson Firearms","x":-1710,"y":419,"location":"Salton"},
+      {"id":"A874cd21e-7d13-57bb-81ee-5f0a225096d2","sourceId":"ammu-nation-everyday-vice-city-firearms","name":"Vice City Firearms","x":-1359,"y":-601,"location":"Tequesta"}
+    ]
+  },
+  {
+    "kind": "ammu-nation-premium",
+    "type": "gunShop",
+    "points": [
+      {"id":"Ad5f50e9a-2066-5e14-9a46-99962af0f060","sourceId":"ammu-nation-premium-big-shots","name":"Big Shots","x":-2315,"y":-3405,"location":"Hamlet"},
+      {"id":"A18e59e79-5c01-5406-a1b7-805031bf856b","sourceId":"ammu-nation-premium-black-eagle","name":"Black Eagle","x":-2569,"y":1375,"location":"Balsero"}
+    ]
+  },
+  {
+    "kind": "formal",
+    "type": "clothingStore",
+    "points": [
+      {"id":"A9560f40b-a44e-5164-9854-aabcece6a3a0","sourceId":"formal-nola-peacock-bay","name":"Nola (Peacock Bay)","x":-1304,"y":-1637,"location":"Peacock Bay"}
+    ]
+  },
+  {
+    "kind": "souvenir-swimwear",
+    "type": "clothingStore",
+    "points": [
+      {"id":"Af9ead62f-f2a3-5ee0-9408-c4d6a742e5c8","sourceId":"souvenir-swimwear-billies-key-lento-gift-shop","name":"Billie's Key Lento Gift Shop","x":-2387,"y":-5860,"location":"Key Lento"},
+      {"id":"A7825d17e-26d2-55b5-b349-5fe5e5ac4e8a","sourceId":"souvenir-swimwear-key-lento-kahuna","name":"Key Lento Kahuna","x":-2173,"y":-5773,"location":"Key Lento"},
+      {"id":"A6dfea423-c2f9-5f58-87a3-52943f84f860","sourceId":"souvenir-swimwear-leroys","name":"Leroy's","x":-3174,"y":-6664,"location":"Key Lento"},
+      {"id":"Ad3f4208d-3b35-54ab-83af-b2f5d1f68bf7","sourceId":"souvenir-swimwear-the-wonder-whale","name":"The Wonder Whale","x":-2936,"y":-6414,"location":"Key Lento"}
+    ]
+  },
+  {
+    "kind": "thrift",
+    "type": "clothingStore",
+    "points": [
+      {"id":"A7ee90c3e-e2af-58d6-936b-f765d71889f1","sourceId":"thrift-hamlet-thrift","name":"Hamlet Thrift","x":-2606,"y":-3598,"location":"Hamlet"},
+      {"id":"A0c627f02-3e3f-5ca8-9d5c-727f4b6bdf2e","sourceId":"thrift-nifty-threads-island-wear","name":"Nifty Threads Island Wear","x":-2674,"y":-6122,"location":"Key Lento"}
+    ]
+  },
+  {
+    "kind": "hair-beauty",
+    "type": "hairSalon",
+    "points": [
+      {"id":"A4351f6e3-0a59-584d-bfee-a6160e500753","sourceId":"hair-beauty-bellissima-hair-salon","name":"Bellissima Hair Salon","x":-2809,"y":752,"location":"Balsero"}
+    ]
+  },
+  {
+    "kind": "tattoos",
+    "type": "tattoo",
+    "points": [
+      {"id":"A148e889a-d69b-5233-a3f6-a99fe725b7a8","sourceId":"tattoos-layin-ink","name":"Layin' Ink","x":-2553,"y":-3438,"location":"Hamlet"},
+      {"id":"A1534e48e-7d50-56f7-a0b0-35707b418d05","sourceId":"tattoos-the-inked-mermaid","name":"The Inked Mermaid","x":-2114,"y":-5466,"location":"Gambit Bay"}
+    ]
+  },
+  {
+    "kind": "ammu-nation-pawn",
+    "type": "gunShop",
+    "points": [
+      {"id":"Ab5dba832-fcf5-5777-8e18-3c7591bad1a7","sourceId":"ammu-nation-pawn-hamlet-traders","name":"Hamlet Traders","x":-2569,"y":-3027,"location":"Hamlet"}
+    ]
+  },
+  {
+    "kind": "train-stations",
+    "type": "trainStation",
+    "points": [
+      {"id":"A436597a4-5c3e-5977-8994-c45dfee101b9","sourceId":"train-stations-downtown","name":"Downtown","x":-873,"y":-389,"location":"Downtown"},
+      {"id":"A595adc8c-f0a3-55e6-aac6-6ff5bf1a78f1","sourceId":"train-stations-snd-data-center","name":"SND Data Center","x":-4373,"y":-1894,"location":"Watson Bay"},
+      {"id":"A96a31a6d-4069-5f33-a9dd-fb183adcf0f8","sourceId":"train-stations-tequesta-north","name":"Tequesta North","x":-823,"y":-798,"location":"Tequesta"},
+      {"id":"Ab039d236-39ed-5d5a-9af4-ca7d2fc13efa","sourceId":"train-stations-vice-city-airport-central","name":"Vice City Airport Central","x":-1573,"y":-256,"location":"Salton"},
+      {"id":"A7bef26b6-2c40-5073-9a2a-824e44a31cfd","sourceId":"train-stations-vice-city-airport-village","name":"Vice City Airport Village","x":-2215,"y":167,"location":"Salton"},
+      {"id":"Acb101e59-fcac-5493-b50b-d842ad33e360","sourceId":"train-stations-vice-city-central","name":"Vice City Central","x":-1547,"y":-156,"location":"Salton"}
+    ]
+  },
+  {
+    "kind": "pawn-shops",
+    "type": "pawnshop",
+    "points": [
+      {"id":"Ac3dae1f7-f3c7-577e-b4bc-4218de1f4a57","sourceId":"pawn-shops-hamlet-pawn","name":"Hamlet Pawn","x":-2545,"y":-3617,"location":"Hamlet"},
+      {"id":"Af367e885-b95f-5121-ac5e-678b2ae45cb9","sourceId":"pawn-shops-pawn-stash","name":"Pawn Stash","x":-622,"y":1676,"location":"La Perle"}
+    ]
+  }
+]

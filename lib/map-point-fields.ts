@@ -13,3 +13,16 @@ export function readPointFields(formData: FormData) {
   }
   return { name, description: description || null, ...classification };
 }
+
+export function readVerificationSource(value: unknown) {
+  if (typeof value !== "string") return null;
+  const input = value.trim();
+  if (!/^https?:\/\/\S+$/i.test(input) || input.length > 1000) return null;
+
+  try {
+    const url = new URL(input);
+    return url.href.length <= 1000 && !url.username && !url.password ? url.href : null;
+  } catch {
+    return null;
+  }
+}

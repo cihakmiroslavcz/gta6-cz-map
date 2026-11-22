@@ -2,11 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { mapPoints, pointLinkParam } from "@/components/map/map-points";
+import { pointLinkParam } from "@/components/map/map-points";
 import { readMapLocation } from "@/lib/map-location";
-import { readPointFields, type SavePointResult } from "@/lib/map-point-fields";
+import { readPointFields, readVerificationSource, type SavePointResult } from "@/lib/map-point-fields";
 import { isMapPointId, isSuggestionId } from "@/lib/map-point-id";
-import { createSessionClient, getMapAdminClient, isMapAdmin, readMapPoints, readPublishedPoints } from "@/lib/supabase/map-server";
+import { createSessionClient, getMapAdminClient, isMapAdmin, readMapPoints } from "@/lib/supabase/map-server";
 
 export async function signIn(formData: FormData) {
   const client = await createSessionClient();
@@ -47,9 +47,11 @@ export async function addPoint(_previous: SavePointResult, formData: FormData): 
 
   const fields = readPointFields(formData);
   if (!fields) return { error: "Zkontroluj název, popis, kategorii a typ bodu." };
+  const verificationSource = readVerificationSource(formData.get("verificationSource"));
+  if (!verificationSource) return { error: "Přidej platný odkaz na doklad polohy ze hry." };
 
   const { data, error } = await client.from("map_admin_points")
-    .insert({ ...fields, x: location.x, y: location.y })
+    .insert({ ...fields, x: location.x, y: location.y, verification_source: verificationSource })
     .select("id,x,y")
     .single();
   if (error) {
@@ -57,11 +59,23 @@ export async function addPoint(_previous: SavePointResult, formData: FormData): 
     if (error.code === "PGRST205" || error.code === "42P01") {
       return { error: "Ukládání bodů vyžaduje migraci databáze map_admin_points." };
     }
+    if (error.code === "PGRST204" || error.code === "42703") {
+      return { error: "Ukládání dokladu vyžaduje migraci databáze map_point_verification." };
+    }
     return { error: "Bod se nepodařilo uložit. Zkus to znovu." };
   }
 
   revalidateMap();
-  return { point: { ...fields, id: `A${data.id}`, description: fields.description ?? undefined, x: Number(data.x), y: Number(data.y) } };
+  return {
+    point: {
+      ...fields,
+      id: `A${data.id}`,
+      description: fields.description ?? undefined,
+      x: Number(data.x),
+      y: Number(data.y),
+      verificationSource,
+    },
+  };
 }
 
 export async function editPoint(_previous: SavePointResult, formData: FormData): Promise<SavePointResult> {
@@ -99,10 +113,8 @@ export async function hidePoint(_previous: string | null, formData: FormData): P
   if (!isMapPointId(pointId)) {
     return "Bod se nepodařilo najít.";
   }
-  const exists = pointId.startsWith("L")
-    ? mapPoints.some(({ id }) => id === pointId)
-    : (await readPublishedPoints(pointId))?.length;
-  if (!exists) return "Bod se nepodařilo najít.";
+  const points = await readMapPoints(pointId);
+  if (!points?.length) return "Bod se nepodařilo najít.";
 
   const { error } = await client.from("map_hidden_points").upsert(
     { point_id: pointId },
@@ -144,6 +156,8 @@ export async function reviewSuggestion(_previous: string | null, formData: FormD
     if (!fields?.description) {
       return "Doplň platný název, popis, kategorii a typ bodu.";
     }
+    const verificationSource = readVerificationSource(formData.get("verificationSource"));
+    if (!verificationSource) return "Přidej platný odkaz na doklad polohy ze hry.";
 
     const { data: suggestion, error } = await client.from("map_suggestions").select("x,y").eq("id", id).maybeSingle();
     if (error || !suggestion) return "Souřadnice návrhu se nepodařilo načíst.";
@@ -153,6 +167,7 @@ export async function reviewSuggestion(_previous: string | null, formData: FormD
       description: fields.description,
       x: Number(suggestion.x),
       y: Number(suggestion.y),
+      verification_source: verificationSource,
     };
   }
 
@@ -160,6 +175,9 @@ export async function reviewSuggestion(_previous: string | null, formData: FormD
   if (error?.code === "23505") {
     revalidatePath("/admin");
     return "Návrh už byl vyřízený.";
+  }
+  if (error?.code === "PGRST204" || error?.code === "42703") {
+    return "Ukládání dokladu vyžaduje migraci databáze map_point_verification.";
   }
   if (error) return "Návrh se nepodařilo uložit. Zkus to znovu.";
 

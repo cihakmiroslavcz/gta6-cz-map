@@ -172,17 +172,18 @@ function pointIcon({ category, type }: MapPoint) {
   const key = `${category}:${type}`;
   const cached = pointIcons.get(key);
   if (cached) return cached;
+  const { icon: iconName } = pointTypes[type];
 
   const icon = type === "treasure"
     ? divIcon({
-      className: "map-treasure",
+      className: `map-treasure map-pin-${category}`,
       iconSize: [32, 32],
       iconAnchor: [16, 16],
       popupAnchor: [0, -16],
       tooltipAnchor: [0, -12],
     }) : divIcon({
-      className: `map-pin map-pin-${category}`,
-      html: `<span class="material-icon" aria-hidden="true">${pointTypes[type].icon}</span>`,
+      className: `map-pin map-pin-${category} map-pin-type-${type}`,
+      html: `<span class="material-icon" data-icon="${iconName}" aria-hidden="true">${iconName}</span>`,
       iconSize: [36, 36],
       iconAnchor: [18, 36],
       popupAnchor: [0, -34],

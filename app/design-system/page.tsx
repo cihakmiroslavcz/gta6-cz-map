@@ -90,7 +90,7 @@ export default function DesignSystemPage() {
                 <ul className={styles.iconGrid}>
                   {types.map(([type, count]) => (
                     <li key={type}>
-                      <span className={`map-pin map-pin-${category} ${styles.pinExample}`}>
+                      <span className={`map-pin map-pin-${category} map-pin-type-${type} ${styles.pinExample}`}>
                         <MaterialIcon name={pointTypes[type].icon} />
                       </span>
                       <span>{pointTypes[type].label}</span>
